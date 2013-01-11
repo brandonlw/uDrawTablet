@@ -1,0 +1,13 @@
+Stuff I couldn't find elsewhere:
+
+To turn a device off, send: 00 00 08 C0 00 00 00 00 00 00 00 00
+
+To enable wireless controller chatpad events, send: 00 00 0C 1B 00 00 00 00 00 00 00 00
+
+You will have to send alternating 1E/1F keep-alive packets (every second or so, I guess) to keep the chatpad events flowing: 00 00 0C 1E/1F 00 00 00 00 00 00 00 00
+
+After doing this, you'll start getting 00 02 00 F0 event packets (the 02 signifying chatpad data). The same data as the wired chatpad starts appearing at offset 0x18.
+
+There's surely some way to enable/disable the LEDs, but I didn't bother looking.
+
+See a full dump at http://brandonw.net/Xbox360ChatpadLog.zip for more.
