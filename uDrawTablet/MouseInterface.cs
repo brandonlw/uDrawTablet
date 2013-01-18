@@ -335,7 +335,8 @@ namespace uDrawTablet
         bool doLeft = _IsActionRequested(conn, TabletOptionButton.ButtonAction.MoveLeft);
         bool doRight = _IsActionRequested(conn, TabletOptionButton.ButtonAction.MoveRight);
 
-        if (conn.Tablet.PressureType == TabletPressureType.PenPressed)
+        if ((conn.Tablet.PressureType == TabletPressureType.PenPressed) ||
+          (conn.Settings.AllowFingerMovement && conn.Tablet.PressureType == TabletPressureType.FingerPressed))
         {
           if (conn.Settings.MovementType == TabletSettings.TabletMovementType.Absolute)
           {

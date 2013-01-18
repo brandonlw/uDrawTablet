@@ -40,6 +40,8 @@ namespace uDrawTablet
     private const string _DEFAULT_BACK_ACTION = "None";
     private const string _KEY_GUIDE_ACTION = "GuideAction";
     private const string _DEFAULT_GUIDE_ACTION = "TurnOffTablet";
+    private const string _KEY_ALLOW_FINGER_MOVEMENT = "AllowFingerMovement";
+    private const bool _DEFAULT_ALLOW_FINGER_MOVEMENT = false;
 
     public enum TabletMovementType
     {
@@ -51,6 +53,7 @@ namespace uDrawTablet
     public TabletMovementType MovementType { get; set; }
     public int MovementSpeed { get; set; }
     public int Precision { get; set; }
+    public bool AllowFingerMovement { get; set; }
     public TabletOptionButton.ButtonAction AAction { get; set; }
     public TabletOptionButton.ButtonAction BAction { get; set; }
     public TabletOptionButton.ButtonAction XAction { get; set; }
@@ -83,6 +86,7 @@ namespace uDrawTablet
       MovementType = TabletMovementType.Absolute;
       MovementSpeed = _DEFAULT_MOVEMENT_SPEED;
       Precision = _DEFAULT_PRECISION;
+      AllowFingerMovement = _DEFAULT_ALLOW_FINGER_MOVEMENT;
       AAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_A_ACTION);
       BAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_B_ACTION);
       XAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_X_ACTION);
@@ -110,6 +114,13 @@ namespace uDrawTablet
         Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
       int threshold = ret.PenPressureThreshold; int.TryParse(sb.ToString(), out threshold);
       ret.PenPressureThreshold = threshold;
+
+      //Allow finger movement
+      sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, _KEY_ALLOW_FINGER_MOVEMENT, ret.AllowFingerMovement.ToString(), sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+      bool allowFingerMovement = ret.AllowFingerMovement; bool.TryParse(sb.ToString(), out allowFingerMovement);
+      ret.AllowFingerMovement = allowFingerMovement;
 
       //Movement type
       sb = new StringBuilder(255);
@@ -152,6 +163,10 @@ namespace uDrawTablet
     {
       //Pen pressure threshold
       WritePrivateProfileString(_DEFAULT_SECTION, _KEY_PEN_THRESHOLD, this.PenPressureThreshold.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+
+      //Allow finger movement
+      WritePrivateProfileString(_DEFAULT_SECTION, _KEY_ALLOW_FINGER_MOVEMENT, this.AllowFingerMovement.ToString(),
         Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
 
       //Movement type

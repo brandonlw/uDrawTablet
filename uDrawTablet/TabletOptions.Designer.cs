@@ -34,6 +34,10 @@
       this.flpMain = new System.Windows.Forms.FlowLayoutPanel();
       this.tbpMovement = new System.Windows.Forms.TabPage();
       this.grpMovementSettings = new System.Windows.Forms.GroupBox();
+      this.label7 = new System.Windows.Forms.Label();
+      this.trbPrecision = new System.Windows.Forms.TrackBar();
+      this.label8 = new System.Windows.Forms.Label();
+      this.lblPrecision = new System.Windows.Forms.Label();
       this.label1 = new System.Windows.Forms.Label();
       this.label2 = new System.Windows.Forms.Label();
       this.label5 = new System.Windows.Forms.Label();
@@ -47,18 +51,15 @@
       this.rdoRelative = new System.Windows.Forms.RadioButton();
       this.btnSave = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
-      this.label7 = new System.Windows.Forms.Label();
-      this.trbPrecision = new System.Windows.Forms.TrackBar();
-      this.label8 = new System.Windows.Forms.Label();
-      this.lblPrecision = new System.Windows.Forms.Label();
+      this.chkAllowFingerMovement = new System.Windows.Forms.CheckBox();
       this.tbcMain.SuspendLayout();
       this.tbpButtons.SuspendLayout();
       this.tbpMovement.SuspendLayout();
       this.grpMovementSettings.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.trbPrecision)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.trbPenClick)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.trbSpeed)).BeginInit();
       this.grpMovementType.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.trbPrecision)).BeginInit();
       this.SuspendLayout();
       // 
       // tbcMain
@@ -121,12 +122,51 @@
       this.grpMovementSettings.Controls.Add(this.label3);
       this.grpMovementSettings.Controls.Add(this.label6);
       this.grpMovementSettings.Controls.Add(this.label4);
-      this.grpMovementSettings.Location = new System.Drawing.Point(9, 87);
+      this.grpMovementSettings.Location = new System.Drawing.Point(9, 111);
       this.grpMovementSettings.Name = "grpMovementSettings";
-      this.grpMovementSettings.Size = new System.Drawing.Size(397, 305);
+      this.grpMovementSettings.Size = new System.Drawing.Size(397, 281);
       this.grpMovementSettings.TabIndex = 11;
       this.grpMovementSettings.TabStop = false;
       this.grpMovementSettings.Text = "Movement Settings";
+      // 
+      // label7
+      // 
+      this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.label7.AutoSize = true;
+      this.label7.Location = new System.Drawing.Point(363, 196);
+      this.label7.Name = "label7";
+      this.label7.Size = new System.Drawing.Size(31, 13);
+      this.label7.TabIndex = 13;
+      this.label7.Text = "More";
+      // 
+      // trbPrecision
+      // 
+      this.trbPrecision.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.trbPrecision.Location = new System.Drawing.Point(114, 155);
+      this.trbPrecision.Minimum = 1;
+      this.trbPrecision.Name = "trbPrecision";
+      this.trbPrecision.Size = new System.Drawing.Size(277, 42);
+      this.trbPrecision.TabIndex = 11;
+      this.trbPrecision.Value = 1;
+      // 
+      // label8
+      // 
+      this.label8.AutoSize = true;
+      this.label8.Location = new System.Drawing.Point(121, 196);
+      this.label8.Name = "label8";
+      this.label8.Size = new System.Drawing.Size(28, 13);
+      this.label8.TabIndex = 12;
+      this.label8.Text = "Less";
+      // 
+      // lblPrecision
+      // 
+      this.lblPrecision.AutoSize = true;
+      this.lblPrecision.Location = new System.Drawing.Point(55, 155);
+      this.lblPrecision.Name = "lblPrecision";
+      this.lblPrecision.Size = new System.Drawing.Size(53, 13);
+      this.lblPrecision.TabIndex = 10;
+      this.lblPrecision.Text = "Precision:";
       // 
       // label1
       // 
@@ -207,11 +247,12 @@
       // 
       // grpMovementType
       // 
+      this.grpMovementType.Controls.Add(this.chkAllowFingerMovement);
       this.grpMovementType.Controls.Add(this.rdoAbsolute);
       this.grpMovementType.Controls.Add(this.rdoRelative);
       this.grpMovementType.Location = new System.Drawing.Point(9, 6);
       this.grpMovementType.Name = "grpMovementType";
-      this.grpMovementType.Size = new System.Drawing.Size(397, 75);
+      this.grpMovementType.Size = new System.Drawing.Size(397, 99);
       this.grpMovementType.TabIndex = 10;
       this.grpMovementType.TabStop = false;
       this.grpMovementType.Text = "Movement Type";
@@ -261,44 +302,15 @@
       this.btnCancel.UseVisualStyleBackColor = true;
       this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
       // 
-      // label7
+      // chkAllowFingerMovement
       // 
-      this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.label7.AutoSize = true;
-      this.label7.Location = new System.Drawing.Point(363, 196);
-      this.label7.Name = "label7";
-      this.label7.Size = new System.Drawing.Size(31, 13);
-      this.label7.TabIndex = 13;
-      this.label7.Text = "More";
-      // 
-      // trbPrecision
-      // 
-      this.trbPrecision.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
-      this.trbPrecision.Location = new System.Drawing.Point(114, 155);
-      this.trbPrecision.Minimum = 1;
-      this.trbPrecision.Name = "trbPrecision";
-      this.trbPrecision.Size = new System.Drawing.Size(277, 42);
-      this.trbPrecision.TabIndex = 11;
-      this.trbPrecision.Value = 1;
-      // 
-      // label8
-      // 
-      this.label8.AutoSize = true;
-      this.label8.Location = new System.Drawing.Point(121, 196);
-      this.label8.Name = "label8";
-      this.label8.Size = new System.Drawing.Size(28, 13);
-      this.label8.TabIndex = 12;
-      this.label8.Text = "Less";
-      // 
-      // lblPrecision
-      // 
-      this.lblPrecision.AutoSize = true;
-      this.lblPrecision.Location = new System.Drawing.Point(55, 155);
-      this.lblPrecision.Name = "lblPrecision";
-      this.lblPrecision.Size = new System.Drawing.Size(53, 13);
-      this.lblPrecision.TabIndex = 10;
-      this.lblPrecision.Text = "Precision:";
+      this.chkAllowFingerMovement.AutoSize = true;
+      this.chkAllowFingerMovement.Location = new System.Drawing.Point(9, 66);
+      this.chkAllowFingerMovement.Name = "chkAllowFingerMovement";
+      this.chkAllowFingerMovement.Size = new System.Drawing.Size(271, 17);
+      this.chkAllowFingerMovement.TabIndex = 2;
+      this.chkAllowFingerMovement.Text = "Detect movement with fingers (instead of just pen)";
+      this.chkAllowFingerMovement.UseVisualStyleBackColor = true;
       // 
       // TabletOptions
       // 
@@ -320,11 +332,11 @@
       this.tbpMovement.ResumeLayout(false);
       this.grpMovementSettings.ResumeLayout(false);
       this.grpMovementSettings.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.trbPrecision)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.trbPenClick)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.trbSpeed)).EndInit();
       this.grpMovementType.ResumeLayout(false);
       this.grpMovementType.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.trbPrecision)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -353,5 +365,6 @@
     private System.Windows.Forms.TrackBar trbPrecision;
     private System.Windows.Forms.Label label8;
     private System.Windows.Forms.Label lblPrecision;
+    private System.Windows.Forms.CheckBox chkAllowFingerMovement;
   }
 }

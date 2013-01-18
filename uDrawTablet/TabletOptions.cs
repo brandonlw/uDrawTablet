@@ -80,6 +80,7 @@ namespace uDrawTablet
       }
       trbSpeed.Value = _settings.MovementSpeed;
       trbPrecision.Value = _settings.Precision;
+      chkAllowFingerMovement.Checked = _settings.AllowFingerMovement;
       foreach (TabletOptionButton option in flpMain.Controls)
       {
         switch (option.Button)
@@ -133,6 +134,7 @@ namespace uDrawTablet
         _settings.MovementType = TabletSettings.TabletMovementType.Relative;
       _settings.MovementSpeed = trbSpeed.Value;
       _settings.Precision = trbPrecision.Value;
+      _settings.AllowFingerMovement = chkAllowFingerMovement.Checked;
       foreach (TabletOptionButton option in flpMain.Controls)
       {
         switch (option.Button)
