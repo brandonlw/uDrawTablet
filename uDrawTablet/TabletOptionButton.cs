@@ -21,13 +21,33 @@ namespace uDrawTablet
           if (action.Value == cboValue.SelectedItem.ToString())
             ret = action.Key;
 
-        return ret;
+        return (ButtonAction)((int)ret | ((int)this.FullKeyCode << 16));
       }
       set
       {
         foreach (var action in _GetActionNames())
-          if (action.Key == value)
+          if (action.Key == (ButtonAction)(((int)value & 0xFFFF)))
             cboValue.SelectedItem = action.Value;
+
+        this.FullKeyCode = (Keypress.KeyCode)(((int)value >> 16));
+      }
+    }
+
+    public Keypress.KeyCode FullKeyCode
+    {
+      get
+      {
+        return Keypress.GetFullKeyCode(((Keypress.KeyCode)cboKey.SelectedItem),
+          chkCtrl.Checked, chkShift.Checked, chkAlt.Checked, chkWin.Checked, chkSendKeysOnce.Checked);
+      }
+      set
+      {
+        cboKey.SelectedItem = (value & (Keypress.KeyCode)0xFF);
+        chkCtrl.Checked = ((value & Keypress.CTRL_MASK) > 0);
+        chkShift.Checked = ((value & Keypress.SHIFT_MASK) > 0);
+        chkAlt.Checked = ((value & Keypress.ALT_MASK) > 0);
+        chkWin.Checked = ((value & Keypress.WIN_MASK) > 0);
+        chkSendKeysOnce.Checked = ((value & Keypress.SEND_ONCE_MASK) > 0);
       }
     }
 
@@ -56,23 +76,51 @@ namespace uDrawTablet
       MoveDown = 9,
       MoveLeft = 10,
       MoveRight = 11,
-      TurnOffTablet = 12
+      TurnOffTablet = 12,
+      KeyboardKeypress = 13
     };
 
     public TabletOptionButton(TabletButton button)
     {
       InitializeComponent();
 
+      pnlKeyboard.Visible = false;
+      cboValue.SelectedIndexChanged += cboValue_SelectedIndexChanged;
+
+      _Resize();
+
       Button = button;
       lblButtonName.Text = _GetButtonName(button) + ": ";
       foreach (var action in _GetActionNames())
         cboValue.Items.Add(action.Value);
       cboValue.SelectedItem = ButtonAction.None.ToString();
+
+      foreach (var key in Enum.GetValues(typeof(Keypress.KeyCode)))
+        cboKey.Items.Add(key);
+      cboKey.SelectedItem = Keypress.KeyCode.None;
     }
 
     public TabletOptionButton()
     {
       InitializeComponent();
+    }
+
+    private void cboValue_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      if (cboValue.SelectedItem != null)
+      {
+        if (Convert.ToString(cboValue.SelectedItem) == _GetActionNames()[ButtonAction.KeyboardKeypress])
+          pnlKeyboard.Visible = true;
+        else
+          pnlKeyboard.Visible = false;
+
+        _Resize();
+      }
+    }
+
+    private void _Resize()
+    {
+      this.Height = grpMain.Height + grpMain.Margin.Vertical;
     }
 
     private Dictionary<ButtonAction, string> _GetActionNames()
@@ -88,6 +136,7 @@ namespace uDrawTablet
       ret.Add(ButtonAction.RightClick, "Right Mouse Click");
       ret.Add(ButtonAction.ShowOptions, "Show Options");
       ret.Add(ButtonAction.TurnOffTablet, "Turn Off Tablet (Xbox 360 Only)");
+      ret.Add(ButtonAction.KeyboardKeypress, "Press Keyboard Key(s)");
 
       return ret;
     }

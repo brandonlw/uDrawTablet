@@ -33,6 +33,12 @@ namespace uDrawTablet
     [DllImport("user32.dll")]
     static extern void mouse_event(Int32 dwFlags, Int32 dx, Int32 dy, Int32 dwData, UIntPtr dwExtraInfo);
 
+    [DllImport("user32.dll")]
+    static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
+    [DllImport("user32.dll")]
+    static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
     private const int MOUSEEVENTF_ABSOLUTE = 0x8000;
     private const int MOUSEEVENTF_MOVE = 0x0001;
     private const int MOUSEEVENTF_LEFTDOWN = 0x0002;
@@ -48,6 +54,8 @@ namespace uDrawTablet
     private const int _MAX_PEN_PRESSURE_THRESHOLD = 0xFF;
     private static Options _frmOptions;
     private static System.Threading.Timer _timer = null;
+    private static Dictionary<TabletOptionButton.TabletButton, Dictionary<int, int>> _keyCounters;
+    private static Dictionary<Keypress.ModifierKeyCode, int> _modifierCounters;
     public static WirelessReceiver Receiver { get; set; }
     public static List<TabletConnection> Tablets;
 
@@ -102,6 +110,12 @@ namespace uDrawTablet
       Stop();
 
       _frmOptions = options;
+      _keyCounters = new Dictionary<TabletOptionButton.TabletButton, Dictionary<int, int>>();
+      foreach (TabletOptionButton.TabletButton button in Enum.GetValues(typeof(TabletOptionButton.TabletButton)))
+        _keyCounters.Add(button, new Dictionary<int, int>());
+      _modifierCounters = new Dictionary<Keypress.ModifierKeyCode, int>();
+      foreach (Keypress.ModifierKeyCode code in Enum.GetValues(typeof(Keypress.ModifierKeyCode)))
+        _modifierCounters.Add(code, 0);
 
       //Set up Xbox 360 USB wireless receiver
       if (Receiver == null || !Receiver.IsReceiverConnected)
@@ -396,7 +410,115 @@ namespace uDrawTablet
           mouse_event(MOUSEEVENTF_MOVE, 0 - _accel, 0, 0, UIntPtr.Zero);
         if (doRight)
           mouse_event(MOUSEEVENTF_MOVE, _accel, 0, 0, UIntPtr.Zero);
+
+        _CheckKeys(conn, conn.Settings.AAction, TabletOptionButton.TabletButton.ACross, conn.Tablet.ButtonState.CrossHeld);
+        _CheckKeys(conn, conn.Settings.BAction, TabletOptionButton.TabletButton.BCircle, conn.Tablet.ButtonState.CircleHeld);
+        _CheckKeys(conn, conn.Settings.XAction, TabletOptionButton.TabletButton.XSquare, conn.Tablet.ButtonState.SquareHeld);
+        _CheckKeys(conn, conn.Settings.YAction, TabletOptionButton.TabletButton.YTriangle, conn.Tablet.ButtonState.TriangleHeld);
+        _CheckKeys(conn, conn.Settings.UpAction, TabletOptionButton.TabletButton.Up, conn.Tablet.DPadState.UpHeld);
+        _CheckKeys(conn, conn.Settings.DownAction, TabletOptionButton.TabletButton.Down, conn.Tablet.DPadState.DownHeld);
+        _CheckKeys(conn, conn.Settings.LeftAction, TabletOptionButton.TabletButton.Left, conn.Tablet.DPadState.LeftHeld);
+        _CheckKeys(conn, conn.Settings.RightAction, TabletOptionButton.TabletButton.Right, conn.Tablet.DPadState.RightHeld);
+        _CheckKeys(conn, conn.Settings.BackAction, TabletOptionButton.TabletButton.BackSelect, conn.Tablet.ButtonState.SelectHeld);
+        _CheckKeys(conn, conn.Settings.StartAction, TabletOptionButton.TabletButton.Start, conn.Tablet.ButtonState.StartHeld);
+        _CheckKeys(conn, conn.Settings.GuideAction, TabletOptionButton.TabletButton.PSXboxGuide, conn.Tablet.ButtonState.PSHeld);
       }
+    }
+
+    private static void _CheckKeys(TabletConnection conn, TabletOptionButton.ButtonAction action,
+      TabletOptionButton.TabletButton button, bool held)
+    {
+      if (_IsKeypressAction(action))
+      {
+        var a = ((int)action >> 16);
+        byte p = (byte)(a & 0xFF);
+        bool ctrl = (a & (int)Keypress.CTRL_MASK) > 0;
+        bool shift = (a & (int)Keypress.SHIFT_MASK) > 0;
+        bool alt = (a & (int)Keypress.ALT_MASK) > 0;
+        bool win = (a & (int)Keypress.WIN_MASK) > 0;
+        bool sendOnce = (a & (int)Keypress.SEND_ONCE_MASK) > 0;
+
+        if (held)
+        {
+          if (!_keyCounters[button].ContainsKey(p))
+            _keyCounters[button].Add(p, 0);
+
+          if (_keyCounters[button][p] == 0)
+          {
+            if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
+            {
+              _modifierCounters[Keypress.ModifierKeyCode.Control]++;
+              keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 0, UIntPtr.Zero);
+            }
+            if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
+            {
+              _modifierCounters[Keypress.ModifierKeyCode.Shift]++;
+              keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 0, UIntPtr.Zero);
+            }
+            if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
+            {
+              _modifierCounters[Keypress.ModifierKeyCode.Alt]++;
+              keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 0, UIntPtr.Zero);
+            }
+            if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
+            {
+              _modifierCounters[Keypress.ModifierKeyCode.Windows]++;
+              keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 0, UIntPtr.Zero);
+            }
+          }
+
+          //Send the keydown event
+          if (sendOnce && _keyCounters[button][p] == 1)
+          {
+            //Already sent it, do nothing
+          }
+          else
+          {
+            _keyCounters[button][p]++;
+            keybd_event(p, 0, 0, UIntPtr.Zero);
+          }
+        }
+        else
+        {
+          //Send the key up event for the key and each modifier
+          if (_keyCounters[button].ContainsKey(p) &&
+            _keyCounters[button][p] > 0)
+          {
+            _keyCounters[button][p]--;
+            keybd_event(p, 0, 2, UIntPtr.Zero);
+          }
+
+          if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] > 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Control]--;
+            if (_modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
+              keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 2, UIntPtr.Zero);
+          }
+          if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] > 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Shift]--;
+            if (_modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
+              keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 2, UIntPtr.Zero);
+          }
+          if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] > 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Alt]--;
+            if (_modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
+              keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 2, UIntPtr.Zero);
+          }
+          if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] > 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Windows]--;
+            if (_modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
+              keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 2, UIntPtr.Zero);
+          }
+        }
+      }
+    }
+
+    private static bool _IsKeypressAction(TabletOptionButton.ButtonAction action)
+    {
+      return (((int)action & 0xFFFF) == (int)TabletOptionButton.ButtonAction.KeyboardKeypress);
     }
 
     #endregion
