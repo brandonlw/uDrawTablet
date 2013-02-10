@@ -14,6 +14,7 @@ namespace uDrawTablet
 
     private string _iniFileName;
     private TabletSettings _settings;
+    private string _currentDisplay;
 
     #endregion
 
@@ -50,9 +51,12 @@ namespace uDrawTablet
         flpMain.Controls.Add(ctrl);
       }
       this.Resize += Me_Resize;
-      _ResizeControls();
 
       _Load();
+
+      _ResizeControls();
+
+      this.Invalidate();
     }
 
     private void _ResizeControls()
@@ -62,6 +66,10 @@ namespace uDrawTablet
         ctrl.Width = width;
       grpMovementType.Width = tbpButtons.Width - 20;
       grpMovementSettings.Width = tbpMovement.Width - 20;
+
+      float ratio = ((float)SystemInformation.VirtualScreen.Height / (float)SystemInformation.VirtualScreen.Width);
+      pnlDisplays.Height = (int)Math.Round(pnlDisplays.Width * ratio, 0);
+      pnlDisplays.Location = new Point((int)Math.Round(((float)tbpDisplays.Width - pnlDisplays.Width) / 2.0, 0), pnlDisplays.Location.Y);
     }
 
     private void _Load()
@@ -122,6 +130,8 @@ namespace uDrawTablet
             break;
         }
       }
+      _currentDisplay = _settings.CurrentDisplay;
+      chkAllowAllDisplays.Checked = _settings.AllowAllDisplays;
     }
 
     private void _Validate()
@@ -176,6 +186,23 @@ namespace uDrawTablet
             break;
         }
       }
+      _settings.CurrentDisplay = _currentDisplay;
+      _settings.AllowAllDisplays = chkAllowAllDisplays.Checked;
+    }
+
+    public static string GetDeviceName(string deviceName)
+    {
+      string ret = String.Empty;
+
+      foreach (var c in deviceName)
+      {
+        ret += c;
+
+        if (c == '\0')
+          break;
+      }
+
+      return ret;
     }
 
     #endregion
@@ -199,6 +226,108 @@ namespace uDrawTablet
     {
       //Just close
       this.Close();
+    }
+
+    private struct FloatRectangle
+    {
+      public float X;
+      public float Y;
+      public float Width;
+      public float Height;
+
+      public FloatRectangle(float x, float y, float width, float height)
+      {
+        X = x;
+        Y = y;
+        Width = width;
+        Height = height;
+      }
+    };
+
+    private void pnlDisplays_Paint(object sender, PaintEventArgs e)
+    {
+      var g = e.Graphics;
+      var pen = new Pen(Color.Black, 1);
+      var selectedPen = new Pen(Color.Black, 5);
+      var dimensions = new Rectangle(5, 5, pnlDisplays.Width - 15, pnlDisplays.Height - 15);
+
+      g.DrawRectangle(pen, dimensions);
+
+      //Set default display if we don't have one
+      bool found = false;
+      foreach (var screen in Screen.AllScreens)
+      {
+        if (GetDeviceName(screen.DeviceName) == _currentDisplay)
+        {
+          found = true;
+          break;
+        }
+      }
+      if (!found) _currentDisplay = GetDeviceName(Screen.PrimaryScreen.DeviceName);
+
+      var v = SystemInformation.VirtualScreen;
+      var colors = new Color[] { Color.LightBlue, Color.LightGreen, Color.Pink,
+        Color.LightYellow, Color.PowderBlue, Color.LightSalmon };
+      FloatRectangle? selected = null;
+      for (int i = 0; i < Screen.AllScreens.Length; i++)
+      {
+        float x = (float)dimensions.X + ((((float)Screen.AllScreens[i].Bounds.X -
+          (float)v.X) / (float)v.Width) * (float)dimensions.Width);
+        float y = (float)dimensions.Y + ((((float)Screen.AllScreens[i].Bounds.Y -
+          (float)v.Y) / (float)v.Height) * (float)dimensions.Height);
+        float width = (float)Math.Round((float)((float)Screen.AllScreens[i].Bounds.Width /
+          (float)v.Width) * (float)dimensions.Width, 0);
+        float height = (float)Math.Round((float)((float)Screen.AllScreens[i].Bounds.Height /
+          (float)v.Height) * (float)dimensions.Height, 0);
+
+        g.FillRectangle(new SolidBrush(colors[i % colors.Length]), x, y, width, height);
+
+        if (_currentDisplay == GetDeviceName(Screen.AllScreens[i].DeviceName))
+          selected = new FloatRectangle(x, y, width, height);
+        g.DrawRectangle(pen, x, y, width, height);
+      }
+
+      if (selected != null)
+        g.DrawRectangle(selectedPen, selected.Value.X, selected.Value.Y,
+          selected.Value.Width, selected.Value.Height);
+    }
+
+    private void pnlDisplays_MouseClick(object sender, MouseEventArgs e)
+    {
+      var dimensions = new Rectangle(5, 5, pnlDisplays.Width - 15, pnlDisplays.Height - 15);
+      var v = SystemInformation.VirtualScreen;
+
+      for (int i = 0; i < Screen.AllScreens.Length; i++)
+      {
+        float x = (float)dimensions.X + ((((float)Screen.AllScreens[i].Bounds.X -
+          (float)v.X) / (float)v.Width) * (float)dimensions.Width);
+        float y = (float)dimensions.Y + ((((float)Screen.AllScreens[i].Bounds.Y -
+          (float)v.Y) / (float)v.Height) * (float)dimensions.Height);
+        float width = (float)Math.Round((float)((float)Screen.AllScreens[i].Bounds.Width /
+          (float)v.Width) * (float)dimensions.Width, 0);
+        float height = (float)Math.Round((float)((float)Screen.AllScreens[i].Bounds.Height /
+          (float)v.Height) * (float)dimensions.Height, 0);
+
+        if ((e.X >= x) && (e.X < (x + width)) && (e.Y >= y) && (e.Y < (y + height)))
+          _currentDisplay = GetDeviceName(Screen.AllScreens[i].DeviceName);
+      }
+
+      pnlDisplays.Invalidate();
+      pnlDisplays.Update();
+    }
+
+    private void chkAllowAllDisplays_CheckedChanged(object sender, EventArgs e)
+    {
+      if (chkAllowAllDisplays.Checked)
+      {
+        pnlDisplays.Visible = false;
+        lblInstructions.Visible = false;
+      }
+      else
+      {
+        pnlDisplays.Visible = true;
+        lblInstructions.Visible = true;
+      }
     }
 
     #endregion

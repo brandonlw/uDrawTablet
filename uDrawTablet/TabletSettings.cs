@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 
 namespace uDrawTablet
 {
@@ -42,6 +43,9 @@ namespace uDrawTablet
     private const string _DEFAULT_GUIDE_ACTION = "TurnOffTablet";
     private const string _KEY_ALLOW_FINGER_MOVEMENT = "AllowFingerMovement";
     private const bool _DEFAULT_ALLOW_FINGER_MOVEMENT = false;
+    private const string _KEY_CURRENT_DISPLAY = "CurrentDisplay";
+    private const string _KEY_ALLOW_ALL_DISPLAYS = "AllowAllDisplays";
+    private const bool _DEFAULT_ALLOW_ALL_DISPLAYS = false;
 
     public enum TabletMovementType
     {
@@ -65,6 +69,8 @@ namespace uDrawTablet
     public TabletOptionButton.ButtonAction StartAction { get; set; }
     public TabletOptionButton.ButtonAction BackAction { get; set; }
     public TabletOptionButton.ButtonAction GuideAction { get; set; }
+    public string CurrentDisplay { get; set; }
+    public bool AllowAllDisplays { get; set; }
 
     #endregion
 
@@ -98,6 +104,8 @@ namespace uDrawTablet
       StartAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_START_ACTION);
       BackAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_BACK_ACTION);
       GuideAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_GUIDE_ACTION);
+      CurrentDisplay = TabletOptions.GetDeviceName(Screen.PrimaryScreen.DeviceName);
+      AllowAllDisplays = _DEFAULT_ALLOW_ALL_DISPLAYS;
     }
 
     #endregion
@@ -156,6 +164,19 @@ namespace uDrawTablet
       ret.BackAction = _GetAction(iniFileName, _KEY_BACK_ACTION, _DEFAULT_BACK_ACTION);
       ret.GuideAction = _GetAction(iniFileName, _KEY_GUIDE_ACTION, _DEFAULT_GUIDE_ACTION);
 
+      //Display name
+      sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, _KEY_CURRENT_DISPLAY, ret.CurrentDisplay.ToString(), sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+      ret.CurrentDisplay = sb.ToString();
+
+      //Allow all displays
+      sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, _KEY_ALLOW_ALL_DISPLAYS, ret.AllowAllDisplays.ToString(), sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+      bool allowAllDisplays = ret.AllowAllDisplays; bool.TryParse(sb.ToString(), out allowAllDisplays);
+      ret.AllowAllDisplays = allowAllDisplays;
+
       return ret;
     }
 
@@ -193,6 +214,14 @@ namespace uDrawTablet
       _SetAction(iniFileName, _KEY_START_ACTION, StartAction);
       _SetAction(iniFileName, _KEY_BACK_ACTION, BackAction);
       _SetAction(iniFileName, _KEY_GUIDE_ACTION, GuideAction);
+
+      //Display name
+      WritePrivateProfileString(_DEFAULT_SECTION, _KEY_CURRENT_DISPLAY, this.CurrentDisplay.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+
+      //Allow all displays
+      WritePrivateProfileString(_DEFAULT_SECTION, _KEY_ALLOW_ALL_DISPLAYS, this.AllowAllDisplays.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
     }
 
     #endregion

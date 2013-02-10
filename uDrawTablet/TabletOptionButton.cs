@@ -77,7 +77,8 @@ namespace uDrawTablet
       MoveLeft = 10,
       MoveRight = 11,
       TurnOffTablet = 12,
-      KeyboardKeypress = 13
+      KeyboardKeypress = 13,
+      SwitchTabletDisplay = 14
     };
 
     public TabletOptionButton(TabletButton button)
@@ -137,6 +138,7 @@ namespace uDrawTablet
       ret.Add(ButtonAction.ShowOptions, "Show Options");
       ret.Add(ButtonAction.TurnOffTablet, "Turn Off Tablet (Xbox 360 Only)");
       ret.Add(ButtonAction.KeyboardKeypress, "Press Keyboard Key(s)");
+      ret.Add(ButtonAction.SwitchTabletDisplay, "Switch Tablet Display");
 
       return ret;
     }

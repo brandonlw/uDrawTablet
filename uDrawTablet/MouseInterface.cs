@@ -39,6 +39,7 @@ namespace uDrawTablet
     [DllImport("user32.dll")]
     static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
+    private const int MOUSEEVENTF_VIRTUALDESK = 0x4000;
     private const int MOUSEEVENTF_ABSOLUTE = 0x8000;
     private const int MOUSEEVENTF_MOVE = 0x0001;
     private const int MOUSEEVENTF_LEFTDOWN = 0x0002;
@@ -212,6 +213,26 @@ namespace uDrawTablet
         case TabletOptionButton.ButtonAction.TurnOffTablet:
           if (conn.Receiver != null && held) conn.Receiver.TurnOffDevice(conn.ReceiverIndex);
           break;
+        case TabletOptionButton.ButtonAction.SwitchTabletDisplay:
+          if (held)
+          {
+            //Find our current display in the AllScreens list, and then switch to the next one
+            int? index = null;
+            for (int i = 0; i < Screen.AllScreens.Length; i++)
+            {
+              if (conn.CurrentDisplay == Screen.AllScreens[i])
+              {
+                index = i;
+                break;
+              }
+            }
+            if (!index.HasValue)
+              conn.CurrentDisplay = Screen.PrimaryScreen;
+            else
+              conn.CurrentDisplay = Screen.AllScreens[(index.Value + 1) % Screen.AllScreens.Length];
+          }
+
+          break;
         default:
           break;
       }
@@ -335,8 +356,8 @@ namespace uDrawTablet
     {
       if (conn != null)
       {
-        const double TABLET_PAD_WIDTH = 1920;
-        const double TABLET_PAD_HEIGHT = 1080;
+        const float TABLET_PAD_WIDTH = 1920;
+        const float TABLET_PAD_HEIGHT = 1080;
 
         double threshold = ((conn.Settings.PenPressureThreshold / 10.0) *
           (_MAX_PEN_PRESSURE_THRESHOLD - _MIN_PEN_PRESSURE_THRESHOLD)) + _MIN_PEN_PRESSURE_THRESHOLD;
@@ -355,11 +376,25 @@ namespace uDrawTablet
           if (conn.Settings.MovementType == TabletSettings.TabletMovementType.Absolute)
           {
             //Calculate the absolute coordinates of the new mouse position
-            double x = (conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH) * 65536;
-            double y = (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT) * 65536;
+            float x = (conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH) * (float)65536.0;
+            float y = (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT)  * (float)65536.0;
+
+            if (!conn.Settings.AllowAllDisplays)
+            {
+              var v = SystemInformation.VirtualScreen;
+              float width = (float)Math.Round((float)((float)conn.CurrentDisplay.Bounds.Width /
+                (float)v.Width) * 65536.0, 0);
+              float height = (float)Math.Round((float)((float)conn.CurrentDisplay.Bounds.Height /
+                (float)v.Height) * 65536.0, 0);
+              x = ((conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH) * width) + ((((float)conn.CurrentDisplay.Bounds.X -
+                (float)v.X) / (float)v.Width) * (float)65536.0);
+              y = (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT * height) + ((((float)conn.CurrentDisplay.Bounds.Y -
+                (float)v.Y) / (float)v.Height) * (float)65536.0);
+            }
 
             if (Cursor.Position.X != x && Cursor.Position.Y != y)
-              mouse_event(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE, (int)x, (int)y, 0, UIntPtr.Zero);
+              mouse_event(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK,
+                (int)x, (int)y, 0, UIntPtr.Zero);
           }
           else if (conn.Settings.MovementType == TabletSettings.TabletMovementType.Relative)
           {

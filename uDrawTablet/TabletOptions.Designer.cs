@@ -47,11 +47,16 @@
       this.label6 = new System.Windows.Forms.Label();
       this.label4 = new System.Windows.Forms.Label();
       this.grpMovementType = new System.Windows.Forms.GroupBox();
+      this.chkAllowFingerMovement = new System.Windows.Forms.CheckBox();
       this.rdoAbsolute = new System.Windows.Forms.RadioButton();
       this.rdoRelative = new System.Windows.Forms.RadioButton();
+      this.tbpDisplays = new System.Windows.Forms.TabPage();
+      this.pnlDisplays = new System.Windows.Forms.Panel();
       this.btnSave = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
-      this.chkAllowFingerMovement = new System.Windows.Forms.CheckBox();
+      this.lblInstructions = new System.Windows.Forms.Label();
+      this.flpDisplays = new System.Windows.Forms.FlowLayoutPanel();
+      this.chkAllowAllDisplays = new System.Windows.Forms.CheckBox();
       this.tbcMain.SuspendLayout();
       this.tbpButtons.SuspendLayout();
       this.tbpMovement.SuspendLayout();
@@ -60,6 +65,8 @@
       ((System.ComponentModel.ISupportInitialize)(this.trbPenClick)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.trbSpeed)).BeginInit();
       this.grpMovementType.SuspendLayout();
+      this.tbpDisplays.SuspendLayout();
+      this.flpDisplays.SuspendLayout();
       this.SuspendLayout();
       // 
       // tbcMain
@@ -69,6 +76,7 @@
                   | System.Windows.Forms.AnchorStyles.Right)));
       this.tbcMain.Controls.Add(this.tbpButtons);
       this.tbcMain.Controls.Add(this.tbpMovement);
+      this.tbcMain.Controls.Add(this.tbpDisplays);
       this.tbcMain.Location = new System.Drawing.Point(7, 7);
       this.tbcMain.Name = "tbcMain";
       this.tbcMain.SelectedIndex = 0;
@@ -257,6 +265,16 @@
       this.grpMovementType.TabStop = false;
       this.grpMovementType.Text = "Movement Type";
       // 
+      // chkAllowFingerMovement
+      // 
+      this.chkAllowFingerMovement.AutoSize = true;
+      this.chkAllowFingerMovement.Location = new System.Drawing.Point(9, 66);
+      this.chkAllowFingerMovement.Name = "chkAllowFingerMovement";
+      this.chkAllowFingerMovement.Size = new System.Drawing.Size(271, 17);
+      this.chkAllowFingerMovement.TabIndex = 2;
+      this.chkAllowFingerMovement.Text = "Detect movement with fingers (instead of just pen)";
+      this.chkAllowFingerMovement.UseVisualStyleBackColor = true;
+      // 
       // rdoAbsolute
       // 
       this.rdoAbsolute.AutoSize = true;
@@ -278,6 +296,27 @@
       this.rdoRelative.TabStop = true;
       this.rdoRelative.Text = "Relative (swipes move mouse cursor in indicated direction)";
       this.rdoRelative.UseVisualStyleBackColor = true;
+      // 
+      // tbpDisplays
+      // 
+      this.tbpDisplays.Controls.Add(this.flpDisplays);
+      this.tbpDisplays.Location = new System.Drawing.Point(4, 22);
+      this.tbpDisplays.Name = "tbpDisplays";
+      this.tbpDisplays.Size = new System.Drawing.Size(441, 398);
+      this.tbpDisplays.TabIndex = 3;
+      this.tbpDisplays.Text = "Displays";
+      this.tbpDisplays.UseVisualStyleBackColor = true;
+      // 
+      // pnlDisplays
+      // 
+      this.pnlDisplays.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.pnlDisplays.Location = new System.Drawing.Point(3, 26);
+      this.pnlDisplays.Name = "pnlDisplays";
+      this.pnlDisplays.Size = new System.Drawing.Size(275, 165);
+      this.pnlDisplays.TabIndex = 0;
+      this.pnlDisplays.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlDisplays_Paint);
+      this.pnlDisplays.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlDisplays_MouseClick);
       // 
       // btnSave
       // 
@@ -302,15 +341,39 @@
       this.btnCancel.UseVisualStyleBackColor = true;
       this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
       // 
-      // chkAllowFingerMovement
+      // lblInstructions
       // 
-      this.chkAllowFingerMovement.AutoSize = true;
-      this.chkAllowFingerMovement.Location = new System.Drawing.Point(9, 66);
-      this.chkAllowFingerMovement.Name = "chkAllowFingerMovement";
-      this.chkAllowFingerMovement.Size = new System.Drawing.Size(271, 17);
-      this.chkAllowFingerMovement.TabIndex = 2;
-      this.chkAllowFingerMovement.Text = "Detect movement with fingers (instead of just pen)";
-      this.chkAllowFingerMovement.UseVisualStyleBackColor = true;
+      this.lblInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.lblInstructions.AutoSize = true;
+      this.lblInstructions.Location = new System.Drawing.Point(3, 194);
+      this.lblInstructions.Name = "lblInstructions";
+      this.lblInstructions.Size = new System.Drawing.Size(265, 39);
+      this.lblInstructions.TabIndex = 1;
+      this.lblInstructions.Text = "Highlight which display the tablet will use.\r\nYou can assign a \"Switch Tablet Dis" +
+          "play\" action to one\r\nof the tablet\'s buttons via the \"Buttons\" tab.";
+      // 
+      // flpDisplays
+      // 
+      this.flpDisplays.Controls.Add(this.chkAllowAllDisplays);
+      this.flpDisplays.Controls.Add(this.pnlDisplays);
+      this.flpDisplays.Controls.Add(this.lblInstructions);
+      this.flpDisplays.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.flpDisplays.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+      this.flpDisplays.Location = new System.Drawing.Point(0, 0);
+      this.flpDisplays.Name = "flpDisplays";
+      this.flpDisplays.Size = new System.Drawing.Size(441, 398);
+      this.flpDisplays.TabIndex = 3;
+      // 
+      // chkAllowAllDisplays
+      // 
+      this.chkAllowAllDisplays.AutoSize = true;
+      this.chkAllowAllDisplays.Location = new System.Drawing.Point(3, 3);
+      this.chkAllowAllDisplays.Name = "chkAllowAllDisplays";
+      this.chkAllowAllDisplays.Size = new System.Drawing.Size(275, 17);
+      this.chkAllowAllDisplays.TabIndex = 2;
+      this.chkAllowAllDisplays.Text = "Allow absolute movement across all displays at once";
+      this.chkAllowAllDisplays.UseVisualStyleBackColor = true;
+      this.chkAllowAllDisplays.CheckedChanged += new System.EventHandler(this.chkAllowAllDisplays_CheckedChanged);
       // 
       // TabletOptions
       // 
@@ -324,6 +387,7 @@
       this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
+      this.MinimumSize = new System.Drawing.Size(469, 495);
       this.Name = "TabletOptions";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.Text = "Tablet Options";
@@ -337,6 +401,9 @@
       ((System.ComponentModel.ISupportInitialize)(this.trbSpeed)).EndInit();
       this.grpMovementType.ResumeLayout(false);
       this.grpMovementType.PerformLayout();
+      this.tbpDisplays.ResumeLayout(false);
+      this.flpDisplays.ResumeLayout(false);
+      this.flpDisplays.PerformLayout();
       this.ResumeLayout(false);
 
     }
@@ -366,5 +433,10 @@
     private System.Windows.Forms.Label label8;
     private System.Windows.Forms.Label lblPrecision;
     private System.Windows.Forms.CheckBox chkAllowFingerMovement;
+    private System.Windows.Forms.TabPage tbpDisplays;
+    private System.Windows.Forms.Panel pnlDisplays;
+    private System.Windows.Forms.Label lblInstructions;
+    private System.Windows.Forms.FlowLayoutPanel flpDisplays;
+    private System.Windows.Forms.CheckBox chkAllowAllDisplays;
   }
 }
