@@ -41,6 +41,8 @@ namespace uDrawTablet
     private const string _DEFAULT_BACK_ACTION = "None";
     private const string _KEY_GUIDE_ACTION = "GuideAction";
     private const string _DEFAULT_GUIDE_ACTION = "TurnOffTablet";
+    private const string _KEY_CLICK_ACTION = "ClickAction";
+    private const string _DEFAULT_CLICK_ACTION = "LeftClick";
     private const string _KEY_ALLOW_FINGER_MOVEMENT = "AllowFingerMovement";
     private const bool _DEFAULT_ALLOW_FINGER_MOVEMENT = false;
     private const string _KEY_CURRENT_DISPLAY = "CurrentDisplay";
@@ -69,6 +71,7 @@ namespace uDrawTablet
     public TabletOptionButton.ButtonAction StartAction { get; set; }
     public TabletOptionButton.ButtonAction BackAction { get; set; }
     public TabletOptionButton.ButtonAction GuideAction { get; set; }
+    public TabletOptionButton.ButtonAction ClickAction { get; set; }
     public string CurrentDisplay { get; set; }
     public bool AllowAllDisplays { get; set; }
 
@@ -104,6 +107,7 @@ namespace uDrawTablet
       StartAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_START_ACTION);
       BackAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_BACK_ACTION);
       GuideAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_GUIDE_ACTION);
+      ClickAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_CLICK_ACTION);
       CurrentDisplay = TabletOptions.GetDeviceName(Screen.PrimaryScreen.DeviceName);
       AllowAllDisplays = _DEFAULT_ALLOW_ALL_DISPLAYS;
     }
@@ -163,6 +167,7 @@ namespace uDrawTablet
       ret.StartAction = _GetAction(iniFileName, _KEY_START_ACTION, _DEFAULT_START_ACTION);
       ret.BackAction = _GetAction(iniFileName, _KEY_BACK_ACTION, _DEFAULT_BACK_ACTION);
       ret.GuideAction = _GetAction(iniFileName, _KEY_GUIDE_ACTION, _DEFAULT_GUIDE_ACTION);
+      ret.ClickAction = _GetAction(iniFileName, _KEY_CLICK_ACTION, _DEFAULT_CLICK_ACTION);
 
       //Display name
       sb = new StringBuilder(255);
@@ -214,6 +219,7 @@ namespace uDrawTablet
       _SetAction(iniFileName, _KEY_START_ACTION, StartAction);
       _SetAction(iniFileName, _KEY_BACK_ACTION, BackAction);
       _SetAction(iniFileName, _KEY_GUIDE_ACTION, GuideAction);
+      _SetAction(iniFileName, _KEY_CLICK_ACTION, ClickAction);
 
       //Display name
       WritePrivateProfileString(_DEFAULT_SECTION, _KEY_CURRENT_DISPLAY, this.CurrentDisplay.ToString(),

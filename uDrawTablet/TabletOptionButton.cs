@@ -63,7 +63,8 @@ namespace uDrawTablet
       Right = 8,
       Start = 9,
       BackSelect = 10,
-      PSXboxGuide = 11
+      PSXboxGuide = 11,
+      PenClick = 12
     };
 
     public enum ButtonAction
@@ -177,6 +178,11 @@ namespace uDrawTablet
         case TabletButton.YTriangle:
           {
             ret = "Y / Triangle";
+            break;
+          }
+        case TabletButton.PenClick:
+          {
+            ret = "Pen Click";
             break;
           }
         default:

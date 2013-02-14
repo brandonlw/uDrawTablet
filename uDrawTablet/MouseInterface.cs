@@ -362,7 +362,7 @@ namespace uDrawTablet
         double threshold = ((conn.Settings.PenPressureThreshold / 10.0) *
           (_MAX_PEN_PRESSURE_THRESHOLD - _MIN_PEN_PRESSURE_THRESHOLD)) + _MIN_PEN_PRESSURE_THRESHOLD;
         if (conn.LastPressure != (conn.Tablet.PenPressure >= threshold))
-          mouse_event(conn.Tablet.PenPressure >= threshold ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
+          _PerformAction(conn, conn.Settings.ClickAction, conn.Tablet.PenPressure >= threshold);
         conn.LastPressure = (conn.Tablet.PenPressure >= threshold);
 
         bool doUp = _IsActionRequested(conn, TabletOptionButton.ButtonAction.MoveUp);

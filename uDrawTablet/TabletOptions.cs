@@ -126,6 +126,9 @@ namespace uDrawTablet
           case TabletOptionButton.TabletButton.PSXboxGuide:
             option.Action = _settings.GuideAction;
             break;
+          case TabletOptionButton.TabletButton.PenClick:
+            option.Action = _settings.ClickAction;
+            break;
           default:
             break;
         }
@@ -181,6 +184,9 @@ namespace uDrawTablet
             break;
           case TabletOptionButton.TabletButton.PSXboxGuide:
             _settings.GuideAction = option.Action;
+            break;
+          case TabletOptionButton.TabletButton.PenClick:
+            _settings.ClickAction = option.Action;
             break;
           default:
             break;
