@@ -11,6 +11,7 @@ namespace uDrawTablet
   public partial class TabletOptionButton : UserControl
   {
     public TabletButton Button;
+
     public ButtonAction Action
     {
       get
@@ -51,6 +52,18 @@ namespace uDrawTablet
       }
     }
 
+    public string FileToExecute
+    {
+      get
+      {
+        return txtFile.Text;
+      }
+      set
+      {
+        txtFile.Text = value;
+      }
+    }
+
     public enum TabletButton
     {
       ACross = 1,
@@ -79,7 +92,8 @@ namespace uDrawTablet
       MoveRight = 11,
       TurnOffTablet = 12,
       KeyboardKeypress = 13,
-      SwitchTabletDisplay = 14
+      SwitchTabletDisplay = 14,
+      ExecuteFile = 15
     };
 
     public TabletOptionButton(TabletButton button)
@@ -87,6 +101,7 @@ namespace uDrawTablet
       InitializeComponent();
 
       pnlKeyboard.Visible = false;
+      pnlExecute.Visible = false;
       cboValue.SelectedIndexChanged += cboValue_SelectedIndexChanged;
 
       _Resize();
@@ -115,9 +130,28 @@ namespace uDrawTablet
           pnlKeyboard.Visible = true;
         else
           pnlKeyboard.Visible = false;
+        if (Convert.ToString(cboValue.SelectedItem) == _GetActionNames()[ButtonAction.ExecuteFile])
+          pnlExecute.Visible = true;
+        else
+          pnlExecute.Visible = false;
 
         _Resize();
       }
+    }
+
+    private void btnBrowse_Click(object sender, EventArgs e)
+    {
+      var ofd = new OpenFileDialog();
+      ofd.AddExtension = false;
+      ofd.CheckFileExists = false;
+      ofd.CheckPathExists = false;
+      ofd.Multiselect = false;
+      ofd.RestoreDirectory = true;
+      ofd.SupportMultiDottedExtensions = true;
+      ofd.Title = "Select File to Execute";
+
+      if (ofd.ShowDialog() == DialogResult.OK)
+        txtFile.Text = ofd.FileName;
     }
 
     private void _Resize()
@@ -140,6 +174,7 @@ namespace uDrawTablet
       ret.Add(ButtonAction.TurnOffTablet, "Turn Off Tablet (Xbox 360 Only)");
       ret.Add(ButtonAction.KeyboardKeypress, "Press Keyboard Key(s)");
       ret.Add(ButtonAction.SwitchTabletDisplay, "Switch Tablet Display");
+      ret.Add(ButtonAction.ExecuteFile, "Execute File");
 
       return ret;
     }

@@ -15,6 +15,53 @@ namespace uDrawTablet
   {
     #region P/Invoke Crud
 
+    [DllImport("shell32.dll", CharSet = CharSet.Auto)]
+    static extern bool ShellExecuteEx(ref SHELLEXECUTEINFO lpExecInfo);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SHELLEXECUTEINFO
+    {
+      public int cbSize;
+      public uint fMask;
+      public IntPtr hwnd;
+      [MarshalAs(UnmanagedType.LPTStr)]
+      public string lpVerb;
+      [MarshalAs(UnmanagedType.LPTStr)]
+      public string lpFile;
+      [MarshalAs(UnmanagedType.LPTStr)]
+      public string lpParameters;
+      [MarshalAs(UnmanagedType.LPTStr)]
+      public string lpDirectory;
+      public int nShow;
+      public IntPtr hInstApp;
+      public IntPtr lpIDList;
+      [MarshalAs(UnmanagedType.LPTStr)]
+      public string lpClass;
+      public IntPtr hkeyClass;
+      public uint dwHotKey;
+      public IntPtr hIcon;
+      public IntPtr hProcess;
+    }
+
+    public enum ShowCommands : int
+    {
+      SW_HIDE = 0,
+      SW_SHOWNORMAL = 1,
+      SW_NORMAL = 1,
+      SW_SHOWMINIMIZED = 2,
+      SW_SHOWMAXIMIZED = 3,
+      SW_MAXIMIZE = 3,
+      SW_SHOWNOACTIVATE = 4,
+      SW_SHOW = 5,
+      SW_MINIMIZE = 6,
+      SW_SHOWMINNOACTIVE = 7,
+      SW_SHOWNA = 8,
+      SW_RESTORE = 9,
+      SW_SHOWDEFAULT = 10,
+      SW_FORCEMINIMIZE = 11,
+      SW_MAX = 11
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct POINT
     {
@@ -168,19 +215,19 @@ namespace uDrawTablet
       var conn = (TabletConnection)sender;
 
       if (conn.Tablet.ButtonState.CrossHeld != conn.LastButtonState.CrossHeld)
-        _PerformAction(conn, conn.Settings.AAction, conn.Tablet.ButtonState.CrossHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.ACross, conn.Settings.AAction, conn.Tablet.ButtonState.CrossHeld);
       if (conn.Tablet.ButtonState.CircleHeld != conn.LastButtonState.CircleHeld)
-        _PerformAction(conn, conn.Settings.BAction, conn.Tablet.ButtonState.CircleHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.BCircle, conn.Settings.BAction, conn.Tablet.ButtonState.CircleHeld);
       if (conn.Tablet.ButtonState.SquareHeld != conn.LastButtonState.SquareHeld)
-        _PerformAction(conn, conn.Settings.XAction, conn.Tablet.ButtonState.SquareHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.XSquare, conn.Settings.XAction, conn.Tablet.ButtonState.SquareHeld);
       if (conn.Tablet.ButtonState.TriangleHeld != conn.LastButtonState.TriangleHeld)
-        _PerformAction(conn, conn.Settings.YAction, conn.Tablet.ButtonState.TriangleHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.YTriangle, conn.Settings.YAction, conn.Tablet.ButtonState.TriangleHeld);
       if (conn.Tablet.ButtonState.StartHeld != conn.LastButtonState.StartHeld)
-        _PerformAction(conn, conn.Settings.StartAction, conn.Tablet.ButtonState.StartHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.Start, conn.Settings.StartAction, conn.Tablet.ButtonState.StartHeld);
       if (conn.Tablet.ButtonState.SelectHeld != conn.LastButtonState.SelectHeld)
-        _PerformAction(conn, conn.Settings.BackAction, conn.Tablet.ButtonState.SelectHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.BackSelect, conn.Settings.BackAction, conn.Tablet.ButtonState.SelectHeld);
       if (conn.Tablet.ButtonState.PSHeld != conn.LastButtonState.PSHeld)
-        _PerformAction(conn, conn.Settings.GuideAction, conn.Tablet.ButtonState.PSHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.PSXboxGuide, conn.Settings.GuideAction, conn.Tablet.ButtonState.PSHeld);
     }
 
     private static void _DPadStateChanged(object sender, EventArgs e)
@@ -188,16 +235,17 @@ namespace uDrawTablet
       var conn = (TabletConnection)sender;
 
       if (conn.Tablet.DPadState.UpHeld != conn.LastDPadState.UpHeld)
-        _PerformAction(conn, conn.Settings.UpAction, conn.Tablet.DPadState.UpHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.Up, conn.Settings.UpAction, conn.Tablet.DPadState.UpHeld);
       if (conn.Tablet.DPadState.DownHeld != conn.LastDPadState.DownHeld)
-        _PerformAction(conn, conn.Settings.DownAction, conn.Tablet.DPadState.DownHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.Down, conn.Settings.DownAction, conn.Tablet.DPadState.DownHeld);
       if (conn.Tablet.DPadState.LeftHeld != conn.LastDPadState.LeftHeld)
-        _PerformAction(conn, conn.Settings.LeftAction, conn.Tablet.DPadState.LeftHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.Left, conn.Settings.LeftAction, conn.Tablet.DPadState.LeftHeld);
       if (conn.Tablet.DPadState.RightHeld != conn.LastDPadState.RightHeld)
-        _PerformAction(conn, conn.Settings.RightAction, conn.Tablet.DPadState.RightHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.Right, conn.Settings.RightAction, conn.Tablet.DPadState.RightHeld);
     }
 
-    private static void _PerformAction(TabletConnection conn, TabletOptionButton.ButtonAction action, bool held)
+    private static void _PerformAction(TabletConnection conn, TabletOptionButton.TabletButton button,
+      TabletOptionButton.ButtonAction action, bool held)
     {
       switch (action)
       {
@@ -230,6 +278,67 @@ namespace uDrawTablet
               conn.CurrentDisplay = Screen.PrimaryScreen;
             else
               conn.CurrentDisplay = Screen.AllScreens[(index.Value + 1) % Screen.AllScreens.Length];
+          }
+
+          break;
+        case TabletOptionButton.ButtonAction.ExecuteFile:
+          if (held)
+          {
+            try
+            {
+              bool ignore = false;
+              var p = new Process();
+              
+              p.StartInfo.ErrorDialog = true;
+              switch (button)
+              {
+                case TabletOptionButton.TabletButton.ACross:
+                  p.StartInfo.FileName = conn.Settings.AFile;
+                  break;
+                case TabletOptionButton.TabletButton.BCircle:
+                  p.StartInfo.FileName = conn.Settings.BFile;
+                  break;
+                case TabletOptionButton.TabletButton.XSquare:
+                  p.StartInfo.FileName = conn.Settings.XFile;
+                  break;
+                case TabletOptionButton.TabletButton.YTriangle:
+                  p.StartInfo.FileName = conn.Settings.YFile;
+                  break;
+                case TabletOptionButton.TabletButton.Up:
+                  p.StartInfo.FileName = conn.Settings.UpFile;
+                  break;
+                case TabletOptionButton.TabletButton.Down:
+                  p.StartInfo.FileName = conn.Settings.DownFile;
+                  break;
+                case TabletOptionButton.TabletButton.Left:
+                  p.StartInfo.FileName = conn.Settings.LeftFile;
+                  break;
+                case TabletOptionButton.TabletButton.Right:
+                  p.StartInfo.FileName = conn.Settings.RightFile;
+                  break;
+                case TabletOptionButton.TabletButton.Start:
+                  p.StartInfo.FileName = conn.Settings.StartFile;
+                  break;
+                case TabletOptionButton.TabletButton.BackSelect:
+                  p.StartInfo.FileName = conn.Settings.BackFile;
+                  break;
+                case TabletOptionButton.TabletButton.PSXboxGuide:
+                  p.StartInfo.FileName = conn.Settings.GuideFile;
+                  break;
+                case TabletOptionButton.TabletButton.PenClick:
+                  p.StartInfo.FileName = conn.Settings.ClickFile;
+                  break;
+                default:
+                  ignore = true;
+                  break;
+              }
+
+              if (!ignore) p.Start();
+            }
+            catch
+            {
+              //Whatever...
+            }
           }
 
           break;
@@ -362,7 +471,7 @@ namespace uDrawTablet
         double threshold = ((conn.Settings.PenPressureThreshold / 10.0) *
           (_MAX_PEN_PRESSURE_THRESHOLD - _MIN_PEN_PRESSURE_THRESHOLD)) + _MIN_PEN_PRESSURE_THRESHOLD;
         if (conn.LastPressure != (conn.Tablet.PenPressure >= threshold))
-          _PerformAction(conn, conn.Settings.ClickAction, conn.Tablet.PenPressure >= threshold);
+          _PerformAction(conn, TabletOptionButton.TabletButton.PenClick, conn.Settings.ClickAction, conn.Tablet.PenPressure >= threshold);
         conn.LastPressure = (conn.Tablet.PenPressure >= threshold);
 
         bool doUp = _IsActionRequested(conn, TabletOptionButton.ButtonAction.MoveUp);

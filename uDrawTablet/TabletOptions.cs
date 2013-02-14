@@ -95,39 +95,51 @@ namespace uDrawTablet
         {
           case TabletOptionButton.TabletButton.ACross:
             option.Action = _settings.AAction;
+            option.FileToExecute = _settings.AFile;
             break;
           case TabletOptionButton.TabletButton.BCircle:
             option.Action = _settings.BAction;
+            option.FileToExecute = _settings.BFile;
             break;
           case TabletOptionButton.TabletButton.XSquare:
             option.Action = _settings.XAction;
+            option.FileToExecute = _settings.XFile;
             break;
           case TabletOptionButton.TabletButton.YTriangle:
             option.Action = _settings.YAction;
+            option.FileToExecute = _settings.YFile;
             break;
           case TabletOptionButton.TabletButton.Up:
             option.Action = _settings.UpAction;
+            option.FileToExecute = _settings.UpFile;
             break;
           case TabletOptionButton.TabletButton.Down:
             option.Action = _settings.DownAction;
+            option.FileToExecute = _settings.DownFile;
             break;
           case TabletOptionButton.TabletButton.Left:
             option.Action = _settings.LeftAction;
+            option.FileToExecute = _settings.LeftFile;
             break;
           case TabletOptionButton.TabletButton.Right:
             option.Action = _settings.RightAction;
+            option.FileToExecute = _settings.RightFile;
             break;
           case TabletOptionButton.TabletButton.Start:
             option.Action = _settings.StartAction;
+            option.FileToExecute = _settings.StartFile;
             break;
           case TabletOptionButton.TabletButton.BackSelect:
             option.Action = _settings.BackAction;
+            option.FileToExecute = _settings.BackFile;
             break;
           case TabletOptionButton.TabletButton.PSXboxGuide:
             option.Action = _settings.GuideAction;
+            option.FileToExecute = _settings.GuideFile;
             break;
           case TabletOptionButton.TabletButton.PenClick:
             option.Action = _settings.ClickAction;
+            option.FileToExecute = _settings.ClickFile;
             break;
           default:
             break;
@@ -154,39 +166,51 @@ namespace uDrawTablet
         {
           case TabletOptionButton.TabletButton.ACross:
             _settings.AAction = option.Action;
+            _settings.AFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.BCircle:
             _settings.BAction = option.Action;
+            _settings.BFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.XSquare:
             _settings.XAction = option.Action;
+            _settings.XFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.YTriangle:
             _settings.YAction = option.Action;
+            _settings.YFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.Up:
             _settings.UpAction = option.Action;
+            _settings.UpFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.Down:
             _settings.DownAction = option.Action;
+            _settings.DownFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.Left:
             _settings.LeftAction = option.Action;
+            _settings.LeftFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.Right:
             _settings.RightAction = option.Action;
+            _settings.RightFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.Start:
             _settings.StartAction = option.Action;
+            _settings.StartFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.BackSelect:
             _settings.BackAction = option.Action;
+            _settings.BackFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.PSXboxGuide:
             _settings.GuideAction = option.Action;
+            _settings.GuideFile = option.FileToExecute;
             break;
           case TabletOptionButton.TabletButton.PenClick:
             _settings.ClickAction = option.Action;
+            _settings.ClickFile = option.FileToExecute;
             break;
           default:
             break;

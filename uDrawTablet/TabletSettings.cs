@@ -20,28 +20,40 @@ namespace uDrawTablet
     private const string _KEY_PRECISION = "Precision";
     private const int _DEFAULT_PRECISION = 3;
     private const string _KEY_A_ACTION = "AAction";
+    private const string _KEY_A_FILE = "AFile";
     private const string _DEFAULT_A_ACTION = "LeftClick";
     private const string _KEY_B_ACTION = "BAction";
+    private const string _KEY_B_FILE = "BFile";
     private const string _DEFAULT_B_ACTION = "None";
     private const string _KEY_X_ACTION = "XAction";
+    private const string _KEY_X_FILE = "XFile";
     private const string _DEFAULT_X_ACTION = "RightClick";
     private const string _KEY_Y_ACTION = "YAction";
+    private const string _KEY_Y_FILE = "YFile";
     private const string _DEFAULT_Y_ACTION = "ShowOptions";
     private const string _KEY_UP_ACTION = "UpAction";
+    private const string _KEY_UP_FILE = "UpFile";
     private const string _DEFAULT_UP_ACTION = "MoveUp";
     private const string _KEY_DOWN_ACTION = "DownAction";
+    private const string _KEY_DOWN_FILE = "DownFile";
     private const string _DEFAULT_DOWN_ACTION = "MoveDown";
     private const string _KEY_LEFT_ACTION = "LeftAction";
+    private const string _KEY_LEFT_FILE = "LeftFile";
     private const string _DEFAULT_LEFT_ACTION = "MoveLeft";
     private const string _KEY_RIGHT_ACTION = "RightAction";
+    private const string _KEY_RIGHT_FILE = "RightFile";
     private const string _DEFAULT_RIGHT_ACTION = "MoveRight";
     private const string _KEY_START_ACTION = "StartAction";
+    private const string _KEY_START_FILE = "StartFile";
     private const string _DEFAULT_START_ACTION = "None";
     private const string _KEY_BACK_ACTION = "BackAction";
+    private const string _KEY_BACK_FILE = "BackFile";
     private const string _DEFAULT_BACK_ACTION = "None";
     private const string _KEY_GUIDE_ACTION = "GuideAction";
+    private const string _KEY_GUIDE_FILE = "GuideFile";
     private const string _DEFAULT_GUIDE_ACTION = "TurnOffTablet";
     private const string _KEY_CLICK_ACTION = "ClickAction";
+    private const string _KEY_CLICK_FILE = "ClickFile";
     private const string _DEFAULT_CLICK_ACTION = "LeftClick";
     private const string _KEY_ALLOW_FINGER_MOVEMENT = "AllowFingerMovement";
     private const bool _DEFAULT_ALLOW_FINGER_MOVEMENT = false;
@@ -61,17 +73,29 @@ namespace uDrawTablet
     public int Precision { get; set; }
     public bool AllowFingerMovement { get; set; }
     public TabletOptionButton.ButtonAction AAction { get; set; }
+    public string AFile { get; set; }
     public TabletOptionButton.ButtonAction BAction { get; set; }
+    public string BFile { get; set; }
     public TabletOptionButton.ButtonAction XAction { get; set; }
+    public string XFile { get; set; }
     public TabletOptionButton.ButtonAction YAction { get; set; }
+    public string YFile { get; set; }
     public TabletOptionButton.ButtonAction UpAction { get; set; }
+    public string UpFile { get; set; }
     public TabletOptionButton.ButtonAction DownAction { get; set; }
+    public string DownFile { get; set; }
     public TabletOptionButton.ButtonAction LeftAction { get; set; }
+    public string LeftFile { get; set; }
     public TabletOptionButton.ButtonAction RightAction { get; set; }
+    public string RightFile { get; set; }
     public TabletOptionButton.ButtonAction StartAction { get; set; }
+    public string StartFile { get; set; }
     public TabletOptionButton.ButtonAction BackAction { get; set; }
+    public string BackFile { get; set; }
     public TabletOptionButton.ButtonAction GuideAction { get; set; }
+    public string GuideFile { get; set; }
     public TabletOptionButton.ButtonAction ClickAction { get; set; }
+    public string ClickFile { get; set; }
     public string CurrentDisplay { get; set; }
     public bool AllowAllDisplays { get; set; }
 
@@ -157,17 +181,29 @@ namespace uDrawTablet
 
       //Actions
       ret.AAction = _GetAction(iniFileName, _KEY_A_ACTION, _DEFAULT_A_ACTION);
+      ret.AFile = _GetString(iniFileName, _KEY_A_FILE);
       ret.BAction = _GetAction(iniFileName, _KEY_B_ACTION, _DEFAULT_B_ACTION);
+      ret.BFile = _GetString(iniFileName, _KEY_B_FILE);
       ret.XAction = _GetAction(iniFileName, _KEY_X_ACTION, _DEFAULT_X_ACTION);
+      ret.XFile = _GetString(iniFileName, _KEY_X_FILE);
       ret.YAction = _GetAction(iniFileName, _KEY_Y_ACTION, _DEFAULT_Y_ACTION);
+      ret.YFile = _GetString(iniFileName, _KEY_Y_FILE);
       ret.UpAction = _GetAction(iniFileName, _KEY_UP_ACTION, _DEFAULT_UP_ACTION);
+      ret.UpFile = _GetString(iniFileName, _KEY_UP_FILE);
       ret.DownAction = _GetAction(iniFileName, _KEY_DOWN_ACTION, _DEFAULT_DOWN_ACTION);
+      ret.DownFile = _GetString(iniFileName, _KEY_DOWN_FILE);
       ret.LeftAction = _GetAction(iniFileName, _KEY_LEFT_ACTION, _DEFAULT_LEFT_ACTION);
+      ret.LeftFile = _GetString(iniFileName, _KEY_LEFT_FILE);
       ret.RightAction = _GetAction(iniFileName, _KEY_RIGHT_ACTION, _DEFAULT_RIGHT_ACTION);
+      ret.RightFile = _GetString(iniFileName, _KEY_RIGHT_FILE);
       ret.StartAction = _GetAction(iniFileName, _KEY_START_ACTION, _DEFAULT_START_ACTION);
+      ret.StartFile = _GetString(iniFileName, _KEY_START_FILE);
       ret.BackAction = _GetAction(iniFileName, _KEY_BACK_ACTION, _DEFAULT_BACK_ACTION);
+      ret.BackFile = _GetString(iniFileName, _KEY_BACK_FILE);
       ret.GuideAction = _GetAction(iniFileName, _KEY_GUIDE_ACTION, _DEFAULT_GUIDE_ACTION);
+      ret.GuideFile = _GetString(iniFileName, _KEY_GUIDE_FILE);
       ret.ClickAction = _GetAction(iniFileName, _KEY_CLICK_ACTION, _DEFAULT_CLICK_ACTION);
+      ret.ClickFile = _GetString(iniFileName, _KEY_CLICK_FILE);
 
       //Display name
       sb = new StringBuilder(255);
@@ -209,17 +245,29 @@ namespace uDrawTablet
 
       //Actions
       _SetAction(iniFileName, _KEY_A_ACTION, AAction);
+      _SetString(iniFileName, _KEY_A_FILE, AFile);
       _SetAction(iniFileName, _KEY_B_ACTION, BAction);
+      _SetString(iniFileName, _KEY_B_FILE, BFile);
       _SetAction(iniFileName, _KEY_X_ACTION, XAction);
+      _SetString(iniFileName, _KEY_X_FILE, XFile);
       _SetAction(iniFileName, _KEY_Y_ACTION, YAction);
+      _SetString(iniFileName, _KEY_Y_FILE, YFile);
       _SetAction(iniFileName, _KEY_UP_ACTION, UpAction);
+      _SetString(iniFileName, _KEY_UP_FILE, UpFile);
       _SetAction(iniFileName, _KEY_DOWN_ACTION, DownAction);
+      _SetString(iniFileName, _KEY_DOWN_FILE, DownFile);
       _SetAction(iniFileName, _KEY_LEFT_ACTION, LeftAction);
+      _SetString(iniFileName, _KEY_LEFT_FILE, LeftFile);
       _SetAction(iniFileName, _KEY_RIGHT_ACTION, RightAction);
+      _SetString(iniFileName, _KEY_RIGHT_FILE, RightFile);
       _SetAction(iniFileName, _KEY_START_ACTION, StartAction);
+      _SetString(iniFileName, _KEY_START_FILE, StartFile);
       _SetAction(iniFileName, _KEY_BACK_ACTION, BackAction);
+      _SetString(iniFileName, _KEY_BACK_FILE, BackFile);
       _SetAction(iniFileName, _KEY_GUIDE_ACTION, GuideAction);
+      _SetString(iniFileName, _KEY_GUIDE_FILE, GuideFile);
       _SetAction(iniFileName, _KEY_CLICK_ACTION, ClickAction);
+      _SetString(iniFileName, _KEY_CLICK_FILE, ClickFile);
 
       //Display name
       WritePrivateProfileString(_DEFAULT_SECTION, _KEY_CURRENT_DISPLAY, this.CurrentDisplay.ToString(),
@@ -243,9 +291,29 @@ namespace uDrawTablet
       return (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), sb.ToString());
     }
 
+    private static string _GetString(string iniFileName, string keyName)
+    {
+      return _GetString(iniFileName, keyName, String.Empty);
+    }
+
+    private static string _GetString(string iniFileName, string keyName, string defaultValue)
+    {
+      var sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, keyName, defaultValue, sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+
+      return sb.ToString();
+    }
+
     private static void _SetAction(string iniFileName, string keyName, TabletOptionButton.ButtonAction action)
     {
       WritePrivateProfileString(_DEFAULT_SECTION, keyName, action.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+    }
+
+    private static void _SetString(string iniFileName, string keyName, string value)
+    {
+      WritePrivateProfileString(_DEFAULT_SECTION, keyName, value,
         Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
     }
 
