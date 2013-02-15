@@ -51,12 +51,17 @@
       this.rdoAbsolute = new System.Windows.Forms.RadioButton();
       this.rdoRelative = new System.Windows.Forms.RadioButton();
       this.tbpDisplays = new System.Windows.Forms.TabPage();
-      this.pnlDisplays = new System.Windows.Forms.Panel();
-      this.btnSave = new System.Windows.Forms.Button();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.lblInstructions = new System.Windows.Forms.Label();
       this.flpDisplays = new System.Windows.Forms.FlowLayoutPanel();
       this.chkAllowAllDisplays = new System.Windows.Forms.CheckBox();
+      this.pnlDisplays = new System.Windows.Forms.Panel();
+      this.lblInstructions = new System.Windows.Forms.Label();
+      this.tbpBounds = new System.Windows.Forms.TabPage();
+      this.flpBounds = new System.Windows.Forms.FlowLayoutPanel();
+      this.chkRestrictToWindow = new System.Windows.Forms.CheckBox();
+      this.chkMaintainAspectRatio = new System.Windows.Forms.CheckBox();
+      this.flpCursorBounds = new System.Windows.Forms.FlowLayoutPanel();
+      this.btnSave = new System.Windows.Forms.Button();
+      this.btnCancel = new System.Windows.Forms.Button();
       this.tbcMain.SuspendLayout();
       this.tbpButtons.SuspendLayout();
       this.tbpMovement.SuspendLayout();
@@ -67,16 +72,19 @@
       this.grpMovementType.SuspendLayout();
       this.tbpDisplays.SuspendLayout();
       this.flpDisplays.SuspendLayout();
+      this.tbpBounds.SuspendLayout();
+      this.flpBounds.SuspendLayout();
       this.SuspendLayout();
       // 
       // tbcMain
       // 
-      this.tbcMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                  | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.tbcMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.tbcMain.Controls.Add(this.tbpButtons);
       this.tbcMain.Controls.Add(this.tbpMovement);
       this.tbcMain.Controls.Add(this.tbpDisplays);
+      this.tbcMain.Controls.Add(this.tbpBounds);
       this.tbcMain.Location = new System.Drawing.Point(7, 7);
       this.tbcMain.Name = "tbcMain";
       this.tbcMain.SelectedIndex = 0;
@@ -149,8 +157,8 @@
       // 
       // trbPrecision
       // 
-      this.trbPrecision.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.trbPrecision.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.trbPrecision.Location = new System.Drawing.Point(114, 155);
       this.trbPrecision.Minimum = 1;
       this.trbPrecision.Name = "trbPrecision";
@@ -206,8 +214,8 @@
       // 
       // trbPenClick
       // 
-      this.trbPenClick.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.trbPenClick.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.trbPenClick.Location = new System.Drawing.Point(114, 8);
       this.trbPenClick.Name = "trbPenClick";
       this.trbPenClick.Size = new System.Drawing.Size(277, 42);
@@ -215,8 +223,8 @@
       // 
       // trbSpeed
       // 
-      this.trbSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.trbSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.trbSpeed.Location = new System.Drawing.Point(114, 88);
       this.trbSpeed.Maximum = 25;
       this.trbSpeed.Minimum = 1;
@@ -307,16 +315,108 @@
       this.tbpDisplays.Text = "Displays";
       this.tbpDisplays.UseVisualStyleBackColor = true;
       // 
+      // flpDisplays
+      // 
+      this.flpDisplays.Controls.Add(this.chkAllowAllDisplays);
+      this.flpDisplays.Controls.Add(this.pnlDisplays);
+      this.flpDisplays.Controls.Add(this.lblInstructions);
+      this.flpDisplays.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.flpDisplays.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+      this.flpDisplays.Location = new System.Drawing.Point(0, 0);
+      this.flpDisplays.Name = "flpDisplays";
+      this.flpDisplays.Size = new System.Drawing.Size(441, 398);
+      this.flpDisplays.TabIndex = 3;
+      // 
+      // chkAllowAllDisplays
+      // 
+      this.chkAllowAllDisplays.AutoSize = true;
+      this.chkAllowAllDisplays.Location = new System.Drawing.Point(3, 3);
+      this.chkAllowAllDisplays.Name = "chkAllowAllDisplays";
+      this.chkAllowAllDisplays.Size = new System.Drawing.Size(275, 17);
+      this.chkAllowAllDisplays.TabIndex = 2;
+      this.chkAllowAllDisplays.Text = "Allow absolute movement across all displays at once";
+      this.chkAllowAllDisplays.UseVisualStyleBackColor = true;
+      this.chkAllowAllDisplays.CheckedChanged += new System.EventHandler(this.chkAllowAllDisplays_CheckedChanged);
+      // 
       // pnlDisplays
       // 
-      this.pnlDisplays.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.pnlDisplays.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.pnlDisplays.Location = new System.Drawing.Point(3, 26);
       this.pnlDisplays.Name = "pnlDisplays";
       this.pnlDisplays.Size = new System.Drawing.Size(275, 165);
       this.pnlDisplays.TabIndex = 0;
       this.pnlDisplays.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlDisplays_Paint);
       this.pnlDisplays.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlDisplays_MouseClick);
+      // 
+      // lblInstructions
+      // 
+      this.lblInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.lblInstructions.AutoSize = true;
+      this.lblInstructions.Location = new System.Drawing.Point(3, 194);
+      this.lblInstructions.Name = "lblInstructions";
+      this.lblInstructions.Size = new System.Drawing.Size(265, 39);
+      this.lblInstructions.TabIndex = 1;
+      this.lblInstructions.Text = "Highlight which display the tablet will use.\r\nYou can assign a \"Switch Tablet Dis" +
+    "play\" action to one\r\nof the tablet\'s buttons via the \"Buttons\" tab.";
+      // 
+      // tbpBounds
+      // 
+      this.tbpBounds.Controls.Add(this.flpBounds);
+      this.tbpBounds.Location = new System.Drawing.Point(4, 22);
+      this.tbpBounds.Name = "tbpBounds";
+      this.tbpBounds.Size = new System.Drawing.Size(441, 398);
+      this.tbpBounds.TabIndex = 4;
+      this.tbpBounds.Text = "Cursor Bounds";
+      this.tbpBounds.UseVisualStyleBackColor = true;
+      // 
+      // flpBounds
+      // 
+      this.flpBounds.Controls.Add(this.chkRestrictToWindow);
+      this.flpBounds.Controls.Add(this.chkMaintainAspectRatio);
+      this.flpBounds.Controls.Add(this.flpCursorBounds);
+      this.flpBounds.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.flpBounds.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+      this.flpBounds.Location = new System.Drawing.Point(0, 0);
+      this.flpBounds.Name = "flpBounds";
+      this.flpBounds.Size = new System.Drawing.Size(441, 398);
+      this.flpBounds.TabIndex = 4;
+      // 
+      // chkRestrictToWindow
+      // 
+      this.chkRestrictToWindow.AutoSize = true;
+      this.chkRestrictToWindow.Location = new System.Drawing.Point(3, 3);
+      this.chkRestrictToWindow.Name = "chkRestrictToWindow";
+      this.chkRestrictToWindow.Size = new System.Drawing.Size(250, 17);
+      this.chkRestrictToWindow.TabIndex = 3;
+      this.chkRestrictToWindow.Text = "Restrict absolute movement to current window";
+      this.chkRestrictToWindow.UseVisualStyleBackColor = true;
+      // 
+      // chkMaintainAspectRatio
+      // 
+      this.chkMaintainAspectRatio.AutoSize = true;
+      this.chkMaintainAspectRatio.Location = new System.Drawing.Point(3, 26);
+      this.chkMaintainAspectRatio.Name = "chkMaintainAspectRatio";
+      this.chkMaintainAspectRatio.Size = new System.Drawing.Size(389, 17);
+      this.chkMaintainAspectRatio.TabIndex = 2;
+      this.chkMaintainAspectRatio.Text = "Maintain absolute aspect ratio (some areas of tablet surface will go unused)";
+      this.chkMaintainAspectRatio.UseVisualStyleBackColor = true;
+      this.chkMaintainAspectRatio.CheckedChanged += new System.EventHandler(this.chkMaintainAspectRatio_CheckedChanged);
+      // 
+      // flpCursorBounds
+      // 
+      this.flpCursorBounds.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.flpCursorBounds.AutoScroll = true;
+      this.flpCursorBounds.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+      this.flpCursorBounds.BackColor = System.Drawing.SystemColors.Control;
+      this.flpCursorBounds.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+      this.flpCursorBounds.Location = new System.Drawing.Point(3, 49);
+      this.flpCursorBounds.Name = "flpCursorBounds";
+      this.flpCursorBounds.Size = new System.Drawing.Size(389, 327);
+      this.flpCursorBounds.TabIndex = 4;
+      this.flpCursorBounds.WrapContents = false;
       // 
       // btnSave
       // 
@@ -340,40 +440,6 @@
       this.btnCancel.Text = "Cancel";
       this.btnCancel.UseVisualStyleBackColor = true;
       this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-      // 
-      // lblInstructions
-      // 
-      this.lblInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.lblInstructions.AutoSize = true;
-      this.lblInstructions.Location = new System.Drawing.Point(3, 194);
-      this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(265, 39);
-      this.lblInstructions.TabIndex = 1;
-      this.lblInstructions.Text = "Highlight which display the tablet will use.\r\nYou can assign a \"Switch Tablet Dis" +
-          "play\" action to one\r\nof the tablet\'s buttons via the \"Buttons\" tab.";
-      // 
-      // flpDisplays
-      // 
-      this.flpDisplays.Controls.Add(this.chkAllowAllDisplays);
-      this.flpDisplays.Controls.Add(this.pnlDisplays);
-      this.flpDisplays.Controls.Add(this.lblInstructions);
-      this.flpDisplays.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.flpDisplays.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-      this.flpDisplays.Location = new System.Drawing.Point(0, 0);
-      this.flpDisplays.Name = "flpDisplays";
-      this.flpDisplays.Size = new System.Drawing.Size(441, 398);
-      this.flpDisplays.TabIndex = 3;
-      // 
-      // chkAllowAllDisplays
-      // 
-      this.chkAllowAllDisplays.AutoSize = true;
-      this.chkAllowAllDisplays.Location = new System.Drawing.Point(3, 3);
-      this.chkAllowAllDisplays.Name = "chkAllowAllDisplays";
-      this.chkAllowAllDisplays.Size = new System.Drawing.Size(275, 17);
-      this.chkAllowAllDisplays.TabIndex = 2;
-      this.chkAllowAllDisplays.Text = "Allow absolute movement across all displays at once";
-      this.chkAllowAllDisplays.UseVisualStyleBackColor = true;
-      this.chkAllowAllDisplays.CheckedChanged += new System.EventHandler(this.chkAllowAllDisplays_CheckedChanged);
       // 
       // TabletOptions
       // 
@@ -404,6 +470,9 @@
       this.tbpDisplays.ResumeLayout(false);
       this.flpDisplays.ResumeLayout(false);
       this.flpDisplays.PerformLayout();
+      this.tbpBounds.ResumeLayout(false);
+      this.flpBounds.ResumeLayout(false);
+      this.flpBounds.PerformLayout();
       this.ResumeLayout(false);
 
     }
@@ -438,5 +507,10 @@
     private System.Windows.Forms.Label lblInstructions;
     private System.Windows.Forms.FlowLayoutPanel flpDisplays;
     private System.Windows.Forms.CheckBox chkAllowAllDisplays;
+    private System.Windows.Forms.TabPage tbpBounds;
+    private System.Windows.Forms.FlowLayoutPanel flpBounds;
+    private System.Windows.Forms.CheckBox chkMaintainAspectRatio;
+    private System.Windows.Forms.CheckBox chkRestrictToWindow;
+    private System.Windows.Forms.FlowLayoutPanel flpCursorBounds;
   }
 }

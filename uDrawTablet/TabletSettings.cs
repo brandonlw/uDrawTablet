@@ -60,6 +60,14 @@ namespace uDrawTablet
     private const string _KEY_CURRENT_DISPLAY = "CurrentDisplay";
     private const string _KEY_ALLOW_ALL_DISPLAYS = "AllowAllDisplays";
     private const bool _DEFAULT_ALLOW_ALL_DISPLAYS = false;
+    private const string _KEY_MAINTAIN_ASPECT_RATIO = "MaintainAspectRatio";
+    private const bool _DEFAULT_MAINTAIN_ASPECT_RATIO = false;
+    private const string _KEY_RESTRICT_TO_CURRENT_WINDOW = "RestrictToCurrentWindow";
+    private const bool _DEFAULT_RESTRICT_TO_CURRENT_WINDOW = false;
+    private const string _KEY_HORIZONTAL_DOCK = "HorizontalDock";
+    private const DockOption.DockOptionValue _DEFAULT_HORIZONTAL_DOCK = DockOption.DockOptionValue.Left;
+    private const string _KEY_VERTICAL_DOCK = "VerticalDock";
+    private const DockOption.DockOptionValue _DEFAULT_VERTICAL_DOCK = DockOption.DockOptionValue.Top;
 
     public enum TabletMovementType
     {
@@ -98,6 +106,10 @@ namespace uDrawTablet
     public string ClickFile { get; set; }
     public string CurrentDisplay { get; set; }
     public bool AllowAllDisplays { get; set; }
+    public bool MaintainAspectRatio { get; set; }
+    public bool RestrictToCurrentWindow { get; set; }
+    public DockOption.DockOptionValue HorizontalDock { get; set; }
+    public DockOption.DockOptionValue VerticalDock { get; set; }
 
     #endregion
 
@@ -134,6 +146,10 @@ namespace uDrawTablet
       ClickAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_CLICK_ACTION);
       CurrentDisplay = TabletOptions.GetDeviceName(Screen.PrimaryScreen.DeviceName);
       AllowAllDisplays = _DEFAULT_ALLOW_ALL_DISPLAYS;
+      MaintainAspectRatio = _DEFAULT_MAINTAIN_ASPECT_RATIO;
+      RestrictToCurrentWindow = _DEFAULT_RESTRICT_TO_CURRENT_WINDOW;
+      HorizontalDock = _DEFAULT_HORIZONTAL_DOCK;
+      VerticalDock = _DEFAULT_VERTICAL_DOCK;
     }
 
     #endregion
@@ -218,6 +234,34 @@ namespace uDrawTablet
       bool allowAllDisplays = ret.AllowAllDisplays; bool.TryParse(sb.ToString(), out allowAllDisplays);
       ret.AllowAllDisplays = allowAllDisplays;
 
+      //Maintain aspect ratio
+      sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, _KEY_MAINTAIN_ASPECT_RATIO, ret.MaintainAspectRatio.ToString(), sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+      bool maintainAspectRatio = ret.MaintainAspectRatio; bool.TryParse(sb.ToString(), out maintainAspectRatio);
+      ret.MaintainAspectRatio = maintainAspectRatio;
+
+      //Restrict to current window
+      sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, _KEY_RESTRICT_TO_CURRENT_WINDOW, ret.RestrictToCurrentWindow.ToString(), sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+      bool restrictToCurrentWindow = ret.RestrictToCurrentWindow; bool.TryParse(sb.ToString(), out restrictToCurrentWindow);
+      ret.RestrictToCurrentWindow = restrictToCurrentWindow;
+
+      //Horizontal dock
+      sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, _KEY_HORIZONTAL_DOCK, ret.HorizontalDock.ToString(), sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+      var hdock = ret.HorizontalDock; hdock = (DockOption.DockOptionValue)Enum.Parse(typeof(DockOption.DockOptionValue), sb.ToString());
+      ret.HorizontalDock = hdock;
+
+      //Vertical dock
+      sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, _KEY_VERTICAL_DOCK, ret.VerticalDock.ToString(), sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+      var vdock = ret.VerticalDock; vdock = (DockOption.DockOptionValue)Enum.Parse(typeof(DockOption.DockOptionValue), sb.ToString());
+      ret.VerticalDock = vdock;
+
       return ret;
     }
 
@@ -275,6 +319,22 @@ namespace uDrawTablet
 
       //Allow all displays
       WritePrivateProfileString(_DEFAULT_SECTION, _KEY_ALLOW_ALL_DISPLAYS, this.AllowAllDisplays.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+
+      //Maintain aspect ratio
+      WritePrivateProfileString(_DEFAULT_SECTION, _KEY_MAINTAIN_ASPECT_RATIO, this.MaintainAspectRatio.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+
+      //Restrict to current window
+      WritePrivateProfileString(_DEFAULT_SECTION, _KEY_RESTRICT_TO_CURRENT_WINDOW, this.RestrictToCurrentWindow.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+
+      //Horizontal dock
+      WritePrivateProfileString(_DEFAULT_SECTION, _KEY_HORIZONTAL_DOCK, this.HorizontalDock.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+
+      //Vertical dock
+      WritePrivateProfileString(_DEFAULT_SECTION, _KEY_VERTICAL_DOCK, this.VerticalDock.ToString(),
         Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
     }
 

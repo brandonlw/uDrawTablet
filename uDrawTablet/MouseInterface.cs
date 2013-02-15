@@ -15,6 +15,21 @@ namespace uDrawTablet
   {
     #region P/Invoke Crud
 
+    [DllImport("user32.dll")]
+    static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+      public int Left;
+      public int Top;
+      public int Right;
+      public int Bottom;
+    }
+
     [DllImport("shell32.dll", CharSet = CharSet.Auto)]
     static extern bool ShellExecuteEx(ref SHELLEXECUTEINFO lpExecInfo);
 
@@ -247,7 +262,7 @@ namespace uDrawTablet
     private static void _PerformAction(TabletConnection conn, TabletOptionButton.TabletButton button,
       TabletOptionButton.ButtonAction action, bool held)
     {
-      switch (action)
+      switch ((TabletOptionButton.ButtonAction)((int)action & 0xFFFF))
       {
         case TabletOptionButton.ButtonAction.LeftClick:
           mouse_event(held ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
@@ -485,23 +500,105 @@ namespace uDrawTablet
           if (conn.Settings.MovementType == TabletSettings.TabletMovementType.Absolute)
           {
             //Calculate the absolute coordinates of the new mouse position
-            float x = (conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH) * (float)65536.0;
-            float y = (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT)  * (float)65536.0;
+            float actualWidth = conn.Settings.AllowAllDisplays ? SystemInformation.VirtualScreen.Width : conn.CurrentDisplay.Bounds.Width;
+            float actualHeight = conn.Settings.AllowAllDisplays ? SystemInformation.VirtualScreen.Height : conn.CurrentDisplay.Bounds.Height;
+            float width = 65536;
+            float height = 65536;
+            float xStart = 0;
+            float yStart = 0;
+            float x = 0;
+            float y = 0;
 
-            if (!conn.Settings.AllowAllDisplays)
+            if (conn.Settings.RestrictToCurrentWindow)
             {
+              //We're only looking at the current window, which could be on any display
               var v = SystemInformation.VirtualScreen;
-              float width = (float)Math.Round((float)((float)conn.CurrentDisplay.Bounds.Width /
+              RECT rect;
+              var hWnd = GetForegroundWindow(); GetWindowRect(hWnd, out rect);
+              int windowWidth = rect.Right - rect.Left, windowHeight = rect.Bottom - rect.Top, windowX = rect.Left, windowY = rect.Top;
+              actualWidth = windowWidth;
+              actualHeight = windowHeight;
+
+              width = (float)Math.Round((float)((float)windowWidth / (float)v.Width) * 65536.0, 0);
+              height = (float)Math.Round((float)((float)windowHeight / (float)v.Height) * 65536.0, 0);
+              xStart = ((((float)windowX - (float)v.X) / (float)v.Width) * (float)65536.0);
+              yStart = ((((float)windowY - (float)v.Y) / (float)v.Height) * (float)65536.0);
+            }
+            else if (!conn.Settings.AllowAllDisplays)
+            {
+              //Find the absolute coordinates for start of current display (which will be X and Y starting offsets)
+              var v = SystemInformation.VirtualScreen;
+              width = (float)Math.Round((float)((float)conn.CurrentDisplay.Bounds.Width /
                 (float)v.Width) * 65536.0, 0);
-              float height = (float)Math.Round((float)((float)conn.CurrentDisplay.Bounds.Height /
+              height = (float)Math.Round((float)((float)conn.CurrentDisplay.Bounds.Height /
                 (float)v.Height) * 65536.0, 0);
-              x = ((conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH) * width) + ((((float)conn.CurrentDisplay.Bounds.X -
+              xStart = ((((float)conn.CurrentDisplay.Bounds.X -
                 (float)v.X) / (float)v.Width) * (float)65536.0);
-              y = (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT * height) + ((((float)conn.CurrentDisplay.Bounds.Y -
+              yStart = ((((float)conn.CurrentDisplay.Bounds.Y -
                 (float)v.Y) / (float)v.Height) * (float)65536.0);
             }
 
-            if (Cursor.Position.X != x && Cursor.Position.Y != y)
+            if (conn.Settings.MaintainAspectRatio)
+            {
+              //Get the current style based on which is higher, width or height
+              var style = ((TABLET_PAD_HEIGHT / TABLET_PAD_WIDTH) >= (actualHeight / actualWidth)) ?
+                DockOption.DockStyle.Vertical : DockOption.DockStyle.Horizontal;
+
+              //Translate the width and height to tablet proportions
+              float tabletWidth = (style == DockOption.DockStyle.Vertical ? TABLET_PAD_WIDTH :
+                TABLET_PAD_WIDTH * ((TABLET_PAD_HEIGHT / TABLET_PAD_WIDTH) / (actualHeight / actualWidth)));
+              float tabletHeight = (style == DockOption.DockStyle.Horizontal ? TABLET_PAD_HEIGHT :
+                TABLET_PAD_HEIGHT * ((actualHeight / actualWidth) / (TABLET_PAD_HEIGHT / TABLET_PAD_WIDTH)));
+              float tabletX = 0;
+              float tabletY = 0;
+              if (style == DockOption.DockStyle.Horizontal)
+              {
+                switch (conn.Settings.HorizontalDock)
+                {
+                  case DockOption.DockOptionValue.Center:
+                    tabletX = (TABLET_PAD_WIDTH - tabletWidth) / 2;
+                    break;
+                  case DockOption.DockOptionValue.Right:
+                    tabletX = TABLET_PAD_WIDTH - tabletWidth;
+                    break;
+                  default:
+                    break;
+                }
+              }
+              else
+              {
+                switch (conn.Settings.VerticalDock)
+                {
+                  case DockOption.DockOptionValue.Center:
+                    tabletY = (TABLET_PAD_HEIGHT - tabletHeight) / 2;
+                    break;
+                  case DockOption.DockOptionValue.Right:
+                    tabletY = TABLET_PAD_HEIGHT - tabletHeight;
+                    break;
+                  default:
+                    break;
+                }
+              }
+
+              //Determine whether our current pressure point is within the box
+              x = conn.Tablet.PressurePoint.X;
+              y = conn.Tablet.PressurePoint.Y;
+              if (x < tabletX) x = tabletX;
+              if (x > (tabletX + tabletWidth)) x = tabletX + tabletWidth;
+              if (y < tabletY) y = tabletY;
+              if (y > (tabletY + tabletHeight)) y = tabletY + tabletHeight;
+
+              //It is, so set the coordinates appropriately
+              x = (((x - tabletX) / tabletWidth) * width) + xStart;
+              y = (((y - tabletY) / tabletHeight) * height) + yStart;
+            }
+            else
+            {
+              x = ((conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH) * width) + xStart;
+              y = (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT * height) + yStart;
+            }
+
+            if (Cursor.Position.X != x && Cursor.Position.Y != y) //not sure if this respects virtual desktop coordinates
               mouse_event(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK,
                 (int)x, (int)y, 0, UIntPtr.Zero);
           }

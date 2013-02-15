@@ -51,6 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DockOption.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DockOption.Designer.cs">
+      <DependentUpon>DockOption.cs</DependentUpon>
+    </Compile>
     <Compile Include="Keypress.cs" />
     <Compile Include="Options.cs">
       <SubType>Form</SubType>
@@ -75,6 +81,9 @@
       <DependentUpon>TabletOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="TabletSettings.cs" />
+    <EmbeddedResource Include="DockOption.resx">
+      <DependentUpon>DockOption.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options.resx">
       <DependentUpon>Options.cs</DependentUpon>
     </EmbeddedResource>

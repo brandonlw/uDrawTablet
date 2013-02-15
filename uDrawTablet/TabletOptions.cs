@@ -44,6 +44,8 @@ namespace uDrawTablet
     private void _Init()
     {
       this.Text = "Tablet Options - " + _iniFileName;
+      flpCursorBounds.Controls.Add(new DockOption(DockOption.DockStyle.Vertical));
+      flpCursorBounds.Controls.Add(new DockOption(DockOption.DockStyle.Horizontal));
 
       foreach (TabletOptionButton.TabletButton button in Enum.GetValues(typeof(TabletOptionButton.TabletButton)))
       {
@@ -53,6 +55,7 @@ namespace uDrawTablet
       this.Resize += Me_Resize;
 
       _Load();
+      _UpdateControls();
 
       _ResizeControls();
 
@@ -147,6 +150,19 @@ namespace uDrawTablet
       }
       _currentDisplay = _settings.CurrentDisplay;
       chkAllowAllDisplays.Checked = _settings.AllowAllDisplays;
+      chkMaintainAspectRatio.Checked = _settings.MaintainAspectRatio;
+      chkRestrictToWindow.Checked = _settings.RestrictToCurrentWindow;
+      foreach (var ctl in flpCursorBounds.Controls)
+      {
+        var c = ctl as DockOption;
+        if (c != null)
+        {
+          if (c.Style == DockOption.DockStyle.Horizontal)
+            c.Value = _settings.HorizontalDock;
+          else if (c.Style == DockOption.DockStyle.Vertical)
+            c.Value = _settings.VerticalDock;
+        }
+      }
     }
 
     private void _Validate()
@@ -218,6 +234,42 @@ namespace uDrawTablet
       }
       _settings.CurrentDisplay = _currentDisplay;
       _settings.AllowAllDisplays = chkAllowAllDisplays.Checked;
+      _settings.MaintainAspectRatio = chkMaintainAspectRatio.Checked;
+      _settings.RestrictToCurrentWindow = chkRestrictToWindow.Checked;
+      foreach (var ctl in flpCursorBounds.Controls)
+      {
+        var c = ctl as DockOption;
+        if (c != null)
+        {
+          if (c.Style == DockOption.DockStyle.Horizontal)
+            _settings.HorizontalDock = c.Value;
+          else if (c.Style == DockOption.DockStyle.Vertical)
+            _settings.VerticalDock = c.Value;
+        }
+      }
+    }
+
+    private void _UpdateControls()
+    {
+      if (chkAllowAllDisplays.Checked)
+      {
+        pnlDisplays.Visible = false;
+        lblInstructions.Visible = false;
+      }
+      else
+      {
+        pnlDisplays.Visible = true;
+        lblInstructions.Visible = true;
+      }
+
+      if (!chkMaintainAspectRatio.Checked)
+      {
+        flpCursorBounds.Visible = false;
+      }
+      else
+      {
+        flpCursorBounds.Visible = true;
+      }
     }
 
     public static string GetDeviceName(string deviceName)
@@ -348,16 +400,12 @@ namespace uDrawTablet
 
     private void chkAllowAllDisplays_CheckedChanged(object sender, EventArgs e)
     {
-      if (chkAllowAllDisplays.Checked)
-      {
-        pnlDisplays.Visible = false;
-        lblInstructions.Visible = false;
-      }
-      else
-      {
-        pnlDisplays.Visible = true;
-        lblInstructions.Visible = true;
-      }
+      _UpdateControls();
+    }
+
+    private void chkMaintainAspectRatio_CheckedChanged(object sender, EventArgs e)
+    {
+      _UpdateControls();
     }
 
     #endregion
