@@ -278,7 +278,7 @@
       this.chkAllowFingerMovement.AutoSize = true;
       this.chkAllowFingerMovement.Location = new System.Drawing.Point(9, 66);
       this.chkAllowFingerMovement.Name = "chkAllowFingerMovement";
-      this.chkAllowFingerMovement.Size = new System.Drawing.Size(271, 17);
+      this.chkAllowFingerMovement.Size = new System.Drawing.Size(261, 17);
       this.chkAllowFingerMovement.TabIndex = 2;
       this.chkAllowFingerMovement.Text = "Detect movement with fingers (instead of just pen)";
       this.chkAllowFingerMovement.UseVisualStyleBackColor = true;
@@ -288,7 +288,7 @@
       this.rdoAbsolute.AutoSize = true;
       this.rdoAbsolute.Location = new System.Drawing.Point(9, 43);
       this.rdoAbsolute.Name = "rdoAbsolute";
-      this.rdoAbsolute.Size = new System.Drawing.Size(329, 17);
+      this.rdoAbsolute.Size = new System.Drawing.Size(320, 17);
       this.rdoAbsolute.TabIndex = 1;
       this.rdoAbsolute.TabStop = true;
       this.rdoAbsolute.Text = "Absolute (taps on tablet surface correspond to screen location)";
@@ -299,7 +299,7 @@
       this.rdoRelative.AutoSize = true;
       this.rdoRelative.Location = new System.Drawing.Point(9, 20);
       this.rdoRelative.Name = "rdoRelative";
-      this.rdoRelative.Size = new System.Drawing.Size(304, 17);
+      this.rdoRelative.Size = new System.Drawing.Size(300, 17);
       this.rdoRelative.TabIndex = 0;
       this.rdoRelative.TabStop = true;
       this.rdoRelative.Text = "Relative (swipes move mouse cursor in indicated direction)";
@@ -332,7 +332,7 @@
       this.chkAllowAllDisplays.AutoSize = true;
       this.chkAllowAllDisplays.Location = new System.Drawing.Point(3, 3);
       this.chkAllowAllDisplays.Name = "chkAllowAllDisplays";
-      this.chkAllowAllDisplays.Size = new System.Drawing.Size(275, 17);
+      this.chkAllowAllDisplays.Size = new System.Drawing.Size(272, 17);
       this.chkAllowAllDisplays.TabIndex = 2;
       this.chkAllowAllDisplays.Text = "Allow absolute movement across all displays at once";
       this.chkAllowAllDisplays.UseVisualStyleBackColor = true;
@@ -344,7 +344,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.pnlDisplays.Location = new System.Drawing.Point(3, 26);
       this.pnlDisplays.Name = "pnlDisplays";
-      this.pnlDisplays.Size = new System.Drawing.Size(275, 165);
+      this.pnlDisplays.Size = new System.Drawing.Size(272, 165);
       this.pnlDisplays.TabIndex = 0;
       this.pnlDisplays.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlDisplays_Paint);
       this.pnlDisplays.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pnlDisplays_MouseClick);
@@ -355,7 +355,7 @@
       this.lblInstructions.AutoSize = true;
       this.lblInstructions.Location = new System.Drawing.Point(3, 194);
       this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(265, 39);
+      this.lblInstructions.Size = new System.Drawing.Size(269, 39);
       this.lblInstructions.TabIndex = 1;
       this.lblInstructions.Text = "Highlight which display the tablet will use.\r\nYou can assign a \"Switch Tablet Dis" +
     "play\" action to one\r\nof the tablet\'s buttons via the \"Buttons\" tab.";
@@ -372,10 +372,12 @@
       // 
       // flpBounds
       // 
+      this.flpBounds.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.flpBounds.Controls.Add(this.chkRestrictToWindow);
       this.flpBounds.Controls.Add(this.chkMaintainAspectRatio);
       this.flpBounds.Controls.Add(this.flpCursorBounds);
-      this.flpBounds.Dock = System.Windows.Forms.DockStyle.Fill;
       this.flpBounds.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
       this.flpBounds.Location = new System.Drawing.Point(0, 0);
       this.flpBounds.Name = "flpBounds";

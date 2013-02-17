@@ -117,10 +117,19 @@ namespace uDrawTablet
       F10 = 0x79,
       F11 = 0x7A,
       F12 = 0x7B,
+      Back = 0xA6,
+      Forward = 0xA7,
+      Semicolon = 0xBA,
       Plus = 0xBB,
       Comma = 0xBC,
       Minus = 0xBD,
-      Period = 0xBE
+      Period = 0xBE,
+      ForwardSlash = 0xBF,
+      Tilde = 0xC0,
+      LeftBracket = 0xDB,
+      Backslash = 0xDC,
+      RightBracket = 0xDD,
+      Quote = 0xDE
     };
   }
 }

@@ -93,7 +93,9 @@ namespace uDrawTablet
       TurnOffTablet = 12,
       KeyboardKeypress = 13,
       SwitchTabletDisplay = 14,
-      ExecuteFile = 15
+      ExecuteFile = 15,
+      ScrollUp = 16,
+      ScrollDown = 17
     };
 
     public TabletOptionButton(TabletButton button)
@@ -175,6 +177,8 @@ namespace uDrawTablet
       ret.Add(ButtonAction.KeyboardKeypress, "Press Keyboard Key(s)");
       ret.Add(ButtonAction.SwitchTabletDisplay, "Switch Tablet Display");
       ret.Add(ButtonAction.ExecuteFile, "Execute File");
+      ret.Add(ButtonAction.ScrollUp, "Scroll Up");
+      ret.Add(ButtonAction.ScrollDown, "Scroll Down");
 
       return ret;
     }
