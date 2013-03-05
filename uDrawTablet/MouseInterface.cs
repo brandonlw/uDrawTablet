@@ -109,6 +109,8 @@ namespace uDrawTablet
     private const int MOUSEEVENTF_RIGHTDOWN = 0x0008;
     private const int MOUSEEVENTF_RIGHTUP = 0x0010;
     private const int MOUSEEVENTF_WHEEL = 0x0800;
+    private const int MOUSEEVENTF_MIDDLEDOWN = 0x0020;
+    private const int MOUSEEVENTF_MIDDLEUP = 0x0040;
 
     #endregion
 
@@ -267,6 +269,9 @@ namespace uDrawTablet
       {
         case TabletOptionButton.ButtonAction.LeftClick:
           mouse_event(held ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
+          break;
+        case TabletOptionButton.ButtonAction.MiddleClick:
+          mouse_event(held ? MOUSEEVENTF_MIDDLEDOWN : MOUSEEVENTF_MIDDLEUP, 0, 0, 0, UIntPtr.Zero);
           break;
         case TabletOptionButton.ButtonAction.RightClick:
           mouse_event(held ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_RIGHTUP, 0, 0, 0, UIntPtr.Zero);

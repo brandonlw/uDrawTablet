@@ -95,7 +95,8 @@ namespace uDrawTablet
       SwitchTabletDisplay = 14,
       ExecuteFile = 15,
       ScrollUp = 16,
-      ScrollDown = 17
+      ScrollDown = 17,
+      MiddleClick = 18
     };
 
     public TabletOptionButton(TabletButton button)
@@ -179,6 +180,7 @@ namespace uDrawTablet
       ret.Add(ButtonAction.ExecuteFile, "Execute File");
       ret.Add(ButtonAction.ScrollUp, "Scroll Up");
       ret.Add(ButtonAction.ScrollDown, "Scroll Down");
+      ret.Add(ButtonAction.MiddleClick, "Middle Mouse Click");
 
       return ret;
     }
