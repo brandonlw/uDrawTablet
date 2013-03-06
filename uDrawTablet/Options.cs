@@ -160,7 +160,7 @@ namespace uDrawTablet
         var devicesToTurnOff = new List<TabletConnection>();
         foreach (var t in MouseInterface.Tablets)
         {
-          if (t.Tablet as Xbox360uDrawTabletDevice != null)
+          if (t.Tablet as Xbox360InputDevice != null)
             devicesToTurnOff.Add(t);
         }
         foreach (var t in devicesToTurnOff)
@@ -178,6 +178,7 @@ namespace uDrawTablet
     {
       //Find out which one we're dealing with
       bool isPS3 = (sender == btnPS3Settings);
+      bool isController = false;
       int? index = null;
       if (!isPS3)
       {
@@ -190,12 +191,20 @@ namespace uDrawTablet
             break;
           }
         }
+
+        if (MouseInterface.Receiver != null)
+        {
+          var info = MouseInterface.Receiver.GetDeviceInformation(index.Value);
+
+          if (info != null)
+            isController = (info.Subtype == Xbox360USB.WirelessReceiver.DeviceSubtype.Controller);
+        }
       }
 
       string fileName = MouseInterface.GetSettingsFileName(isPS3, index);
       if (!String.IsNullOrEmpty(fileName))
       {
-        var frm = new TabletOptions(fileName, TabletSettings.LoadSettings(fileName));
+        var frm = new TabletOptions(isController, fileName, TabletSettings.LoadSettings(fileName));
         frm.ShowDialog();
         frm.Dispose();
 
@@ -221,7 +230,7 @@ namespace uDrawTablet
     private void _SetStatuses()
     {
       //Determine if PS3 tablet exists
-      if (PS3uDrawTabletDevice.IsDetected())
+      if (PS3InputDevice.IsDetected())
       {
         grpPS3.Enabled = true;
         lblPS3Tablet.ForeColor = Color.Green;

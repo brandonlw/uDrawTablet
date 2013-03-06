@@ -77,7 +77,9 @@ namespace uDrawTablet
       Start = 9,
       BackSelect = 10,
       PSXboxGuide = 11,
-      PenClick = 12
+      PenClick = 12,
+      People = 13,
+      Hidden = 9999
     };
 
     public enum ButtonAction
@@ -174,9 +176,9 @@ namespace uDrawTablet
       ret.Add(ButtonAction.MoveUp, "Move Up");
       ret.Add(ButtonAction.RightClick, "Right Mouse Click");
       ret.Add(ButtonAction.ShowOptions, "Show Options");
-      ret.Add(ButtonAction.TurnOffTablet, "Turn Off Tablet (Xbox 360 Only)");
+      ret.Add(ButtonAction.TurnOffTablet, "Turn Off Device (Xbox 360 Only)");
       ret.Add(ButtonAction.KeyboardKeypress, "Press Keyboard Key(s)");
-      ret.Add(ButtonAction.SwitchTabletDisplay, "Switch Tablet Display");
+      ret.Add(ButtonAction.SwitchTabletDisplay, "Switch Display");
       ret.Add(ButtonAction.ExecuteFile, "Execute File");
       ret.Add(ButtonAction.ScrollUp, "Scroll Up");
       ret.Add(ButtonAction.ScrollDown, "Scroll Down");

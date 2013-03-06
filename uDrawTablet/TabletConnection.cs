@@ -12,7 +12,7 @@ namespace uDrawTablet
   {
     #region Declarations
 
-    private ITabletDevice _tablet;
+    private IInputDevice _tablet;
     private TabletSettings _settings;
     public WirelessReceiver Receiver { get; set; }
     public int ReceiverIndex { get; set; }
@@ -42,7 +42,7 @@ namespace uDrawTablet
       }
     }
 
-    public ITabletDevice Tablet
+    public IInputDevice Tablet
     {
       get
       {
@@ -54,6 +54,15 @@ namespace uDrawTablet
         if (_tablet != null)
         {
           _tablet.ButtonStateChanged -= _tablet_ButtonStateChanged;
+          _tablet.DPadStateChanged -= _tablet_DPadStateChanged;
+
+          var dev = _tablet as Xbox360InputDevice;
+          if (dev != null)
+          {
+            dev.ChatpadKeyStateChanged -= _tablet_ChatpadKeyStateChanged;
+            dev.ShiftPressed -= _tablet_ShiftPressed;
+            dev.PeoplePressed -= _tablet_PeoplePressed;
+          }
         }
 
         //Set value
@@ -66,6 +75,14 @@ namespace uDrawTablet
           LastDPadState = (TabletDPadState)_tablet.DPadState.Clone();
           _tablet.ButtonStateChanged += _tablet_ButtonStateChanged;
           _tablet.DPadStateChanged += _tablet_DPadStateChanged;
+
+          var dev = _tablet as Xbox360InputDevice;
+          if (dev != null)
+          {
+            dev.ChatpadKeyStateChanged += _tablet_ChatpadKeyStateChanged;
+            dev.ShiftPressed += _tablet_ShiftPressed;
+            dev.PeoplePressed += _tablet_PeoplePressed;
+          }
         }
       }
     }
@@ -76,19 +93,22 @@ namespace uDrawTablet
 
     public event EventHandler<EventArgs> ButtonStateChanged;
     public event EventHandler<EventArgs> DPadStateChanged;
+    public event EventHandler<ChatpadKeyStateEventArgs> ChatpadKeyStateChanged;
+    public event EventHandler<Xbox360DeviceEventArgs> ShiftPressed;
+    public event EventHandler<Xbox360DeviceEventArgs> PeoplePressed;
 
     #endregion
 
     #region Constructors/Teardown
 
-    public TabletConnection(ITabletDevice tablet)
+    public TabletConnection(IInputDevice tablet)
     {
       Tablet = tablet;
 
       Settings = new TabletSettings();
     }
 
-    public TabletConnection(ITabletDevice tablet, WirelessReceiver receiver, int index)
+    public TabletConnection(IInputDevice tablet, WirelessReceiver receiver, int index)
     {
       Tablet = tablet;
       Receiver = receiver;
@@ -106,7 +126,7 @@ namespace uDrawTablet
       if (ButtonStateChanged != null)
         ButtonStateChanged(this, e);
 
-      LastButtonState = (TabletButtonState)((ITabletDevice)sender).ButtonState.Clone();
+      LastButtonState = (TabletButtonState)((IInputDevice)sender).ButtonState.Clone();
     }
 
     private void _tablet_DPadStateChanged(object sender, EventArgs e)
@@ -114,7 +134,25 @@ namespace uDrawTablet
       if (DPadStateChanged != null)
         DPadStateChanged(this, e);
 
-      LastDPadState = (TabletDPadState)((ITabletDevice)sender).DPadState.Clone();
+      LastDPadState = (TabletDPadState)((IInputDevice)sender).DPadState.Clone();
+    }
+
+    private void _tablet_ChatpadKeyStateChanged(object sender, ChatpadKeyStateEventArgs e)
+    {
+      if (ChatpadKeyStateChanged != null)
+        ChatpadKeyStateChanged(this, e);
+    }
+
+    private void _tablet_ShiftPressed(object sender, Xbox360DeviceEventArgs e)
+    {
+      if (ShiftPressed != null)
+        ShiftPressed(this, e);
+    }
+
+    private void _tablet_PeoplePressed(object sender, Xbox360DeviceEventArgs e)
+    {
+      if (PeoplePressed != null)
+        PeoplePressed(this, e);
     }
 
     #endregion

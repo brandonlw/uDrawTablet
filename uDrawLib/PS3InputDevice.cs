@@ -5,7 +5,7 @@ using System.Text;
 
 namespace uDrawLib
 {
-  public class PS3uDrawTabletDevice : ITabletDevice, IDisposable
+  public class PS3InputDevice : IInputDevice, IDisposable
   {
     #region Declarations
 
@@ -70,7 +70,7 @@ namespace uDrawLib
 
     #region Constructors / Teardown
 
-    public PS3uDrawTabletDevice()
+    public PS3InputDevice()
     {
       ButtonState = new TabletButtonState();
       DPadState = new TabletDPadState();

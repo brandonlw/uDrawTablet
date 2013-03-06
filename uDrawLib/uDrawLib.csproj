@@ -40,8 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ITabletDevice.cs" />
-    <Compile Include="Xbox360uDrawTabletDevice.cs" />
+    <Compile Include="ChatpadKeyStateEventArgs.cs" />
+    <Compile Include="IInputDevice.cs" />
+    <Compile Include="Xbox360DeviceEventArgs.cs" />
+    <Compile Include="Xbox360InputDevice.cs" />
     <Compile Include="DataReceivedEventArgs.cs" />
     <Compile Include="HIDDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -49,7 +51,7 @@
     <Compile Include="TabletButtonState.cs" />
     <Compile Include="TabletDPadState.cs" />
     <Compile Include="TabletPressureType.cs" />
-    <Compile Include="PS3uDrawTabletDevice.cs" />
+    <Compile Include="PS3InputDevice.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Xbox360USB\Xbox360USB.csproj">

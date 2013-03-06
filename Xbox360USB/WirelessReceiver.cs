@@ -297,6 +297,11 @@ namespace Xbox360USB
               slot.Value.RefreshToggle = !slot.Value.RefreshToggle;
               this.WriteData(slot.Key, data);
             }
+
+            //Might be a bit excessive, but whatever
+            if (slot.Value.RefreshToggle)
+              this.WriteData(slot.Key, new byte[] { 0x00, 0x00, 0x0C, 0x1B,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
           }
         }
         catch
@@ -483,9 +488,6 @@ namespace Xbox360USB
             {
               //Device is connected -- set the LED status appropriately
               this.SetLEDStatus(index.Value, (byte)(0x01 + index.Value));
-
-              //Go ahead and enable chatpad events, just in case
-              this.WriteData(index.Value, new byte[] { 0x00, 0x00, 0x0C, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
             }
           }
           else if (buffer[0] == 0x00 && buffer[1] == 0x0F && buffer[2] == 0x00 && buffer[3] == 0xF0)
@@ -499,6 +501,9 @@ namespace Xbox360USB
             {
               _slots[index.Value].IsDeviceConnected = true;
               //Console.WriteLine("Device connected");
+
+              //Go ahead and enable chatpad events, just in case
+              this.WriteData(index.Value, new byte[] { 0x00, 0x00, 0x0C, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
               if (DeviceConnected != null)
                 DeviceConnected(this, new DeviceEventArgs(index.Value));

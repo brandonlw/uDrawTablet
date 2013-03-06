@@ -5,7 +5,7 @@ using System.Text;
 
 namespace uDrawLib
 {
-  public interface ITabletDevice
+  public interface IInputDevice
   {
     /// <summary>
     /// Indicates non-directional button press states have changed.

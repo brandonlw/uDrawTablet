@@ -55,6 +55,9 @@ namespace uDrawTablet
     private const string _KEY_CLICK_ACTION = "ClickAction";
     private const string _KEY_CLICK_FILE = "ClickFile";
     private const string _DEFAULT_CLICK_ACTION = "LeftClick";
+    private const string _KEY_PEOPLE_ACTION = "PeopleAction";
+    private const string _KEY_PEOPLE_FILE = "PeopleFile";
+    private const string _DEFAULT_PEOPLE_ACTION = "None";
     private const string _KEY_ALLOW_FINGER_MOVEMENT = "AllowFingerMovement";
     private const bool _DEFAULT_ALLOW_FINGER_MOVEMENT = false;
     private const string _KEY_CURRENT_DISPLAY = "CurrentDisplay";
@@ -104,6 +107,8 @@ namespace uDrawTablet
     public string GuideFile { get; set; }
     public TabletOptionButton.ButtonAction ClickAction { get; set; }
     public string ClickFile { get; set; }
+    public TabletOptionButton.ButtonAction PeopleAction { get; set; }
+    public string PeopleFile { get; set; }
     public string CurrentDisplay { get; set; }
     public bool AllowAllDisplays { get; set; }
     public bool MaintainAspectRatio { get; set; }
@@ -144,6 +149,7 @@ namespace uDrawTablet
       BackAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_BACK_ACTION);
       GuideAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_GUIDE_ACTION);
       ClickAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_CLICK_ACTION);
+      PeopleAction = (TabletOptionButton.ButtonAction)Enum.Parse(typeof(TabletOptionButton.ButtonAction), _DEFAULT_PEOPLE_ACTION);
       CurrentDisplay = TabletOptions.GetDeviceName(Screen.PrimaryScreen.DeviceName);
       AllowAllDisplays = _DEFAULT_ALLOW_ALL_DISPLAYS;
       MaintainAspectRatio = _DEFAULT_MAINTAIN_ASPECT_RATIO;
@@ -220,6 +226,8 @@ namespace uDrawTablet
       ret.GuideFile = _GetString(iniFileName, _KEY_GUIDE_FILE);
       ret.ClickAction = _GetAction(iniFileName, _KEY_CLICK_ACTION, _DEFAULT_CLICK_ACTION);
       ret.ClickFile = _GetString(iniFileName, _KEY_CLICK_FILE);
+      ret.PeopleAction = _GetAction(iniFileName, _KEY_PEOPLE_ACTION, _DEFAULT_PEOPLE_ACTION);
+      ret.PeopleFile = _GetString(iniFileName, _KEY_PEOPLE_FILE);
 
       //Display name
       sb = new StringBuilder(255);
@@ -312,6 +320,8 @@ namespace uDrawTablet
       _SetString(iniFileName, _KEY_GUIDE_FILE, GuideFile);
       _SetAction(iniFileName, _KEY_CLICK_ACTION, ClickAction);
       _SetString(iniFileName, _KEY_CLICK_FILE, ClickFile);
+      _SetAction(iniFileName, _KEY_PEOPLE_ACTION, PeopleAction);
+      _SetString(iniFileName, _KEY_PEOPLE_FILE, PeopleFile);
 
       //Display name
       WritePrivateProfileString(_DEFAULT_SECTION, _KEY_CURRENT_DISPLAY, this.CurrentDisplay.ToString(),

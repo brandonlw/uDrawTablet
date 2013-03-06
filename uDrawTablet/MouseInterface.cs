@@ -168,7 +168,7 @@ namespace uDrawTablet
     {
       foreach (var t in Tablets)
         t.Settings = TabletSettings.LoadSettings(GetSettingsFileName(
-          t.Tablet as PS3uDrawTabletDevice != null, t.ReceiverIndex));
+          t.Tablet as PS3InputDevice != null, t.ReceiverIndex));
     }
 
     public static void Start(Options options)
@@ -193,7 +193,7 @@ namespace uDrawTablet
       }
 
       //Set up the PS3 tablet dongle
-      var conn = new TabletConnection((new PS3uDrawTabletDevice()) as ITabletDevice);
+      var conn = new TabletConnection((new PS3InputDevice()) as IInputDevice);
       conn.ButtonStateChanged += _ButtonStateChanged;
       conn.DPadStateChanged += _DPadStateChanged;
       conn.Settings = TabletSettings.LoadSettings(GetSettingsFileName(true, null));
@@ -208,7 +208,7 @@ namespace uDrawTablet
       //Dispose of the PS3 tablet
       foreach (var t in Tablets)
       {
-        var ps3 = t.Tablet as PS3uDrawTabletDevice;
+        var ps3 = t.Tablet as PS3InputDevice;
 
         if (ps3 != null)
           ps3.Dispose();
@@ -246,6 +246,65 @@ namespace uDrawTablet
         _PerformAction(conn, TabletOptionButton.TabletButton.BackSelect, conn.Settings.BackAction, conn.Tablet.ButtonState.SelectHeld);
       if (conn.Tablet.ButtonState.PSHeld != conn.LastButtonState.PSHeld)
         _PerformAction(conn, TabletOptionButton.TabletButton.PSXboxGuide, conn.Settings.GuideAction, conn.Tablet.ButtonState.PSHeld);
+    }
+
+    private static void _ChatpadKeyStateChanged(object sender, ChatpadKeyStateEventArgs e)
+    {
+      Xbox360InputDevice dev = null;
+      foreach (var d in Tablets)
+      {
+        if (d.Receiver != null && d.ReceiverIndex == e.Index)
+        {
+          dev = d.Tablet as Xbox360InputDevice;
+          break;
+        }
+      }
+
+      if (dev != null)
+      {
+        var k = Keypress.GetChatpadKeyCode(new Keypress.ChatpadKeyCode(e.KeyCode, dev.OrangeHeld, dev.GreenHeld, dev.ShiftHeld));
+
+        if (k.HasValue)
+          _CheckKeys(TabletOptionButton.TabletButton.Hidden, (int)k.Value, e.Held);
+      }
+    }
+
+    private static void _ShiftPressed(object sender, Xbox360DeviceEventArgs e)
+    {
+      Xbox360InputDevice dev = null;
+      foreach (var d in Tablets)
+      {
+        if (d.Receiver != null && d.ReceiverIndex == e.Index)
+        {
+          dev = d.Tablet as Xbox360InputDevice;
+          break;
+        }
+      }
+
+      if (dev != null && dev.OrangeHeld)
+      {
+        _CheckKeys(TabletOptionButton.TabletButton.Hidden, (int)Keypress.GetFullKeyCode(Keypress.KeyCode.CapsLock), true);
+        _CheckKeys(TabletOptionButton.TabletButton.Hidden, (int)Keypress.GetFullKeyCode(Keypress.KeyCode.CapsLock), false);
+      }
+    }
+
+    private static void _PeoplePressed(object sender, Xbox360DeviceEventArgs e)
+    {
+      TabletConnection conn = null;
+      foreach (var d in Tablets)
+      {
+        if (d.Receiver != null && d.ReceiverIndex == e.Index)
+        {
+          conn = d;
+          break;
+        }
+      }
+
+      if (conn != null)
+      {
+        _PerformAction(conn, TabletOptionButton.TabletButton.People, conn.Settings.PeopleAction, true);
+        _PerformAction(conn, TabletOptionButton.TabletButton.People, conn.Settings.PeopleAction, false);
+      }
     }
 
     private static void _DPadStateChanged(object sender, EventArgs e)
@@ -396,7 +455,7 @@ namespace uDrawTablet
       {
         var info = Receiver.GetDeviceInformation(index);
 
-        if (info != null && info.Subtype == WirelessReceiver.DeviceSubtype.uDrawTablet)
+        if (info != null)
           shouldHandle = true;
 
         foreach (var t in Tablets)
@@ -423,9 +482,13 @@ namespace uDrawTablet
     {
       _Handle360TabletDisconnect(index);
 
-      var connection = new TabletConnection((new Xbox360uDrawTabletDevice(Receiver, index)) as ITabletDevice, Receiver, index);
+      var connection = new TabletConnection((new Xbox360InputDevice(Receiver, index,
+        Receiver.GetDeviceInformation(index))) as IInputDevice, Receiver, index);
       connection.ButtonStateChanged += _ButtonStateChanged;
       connection.DPadStateChanged += _DPadStateChanged;
+      connection.ChatpadKeyStateChanged += _ChatpadKeyStateChanged;
+      connection.ShiftPressed += _ShiftPressed;
+      connection.PeoplePressed += _PeoplePressed;
       Tablets.Add(connection);
       connection.Settings = TabletSettings.LoadSettings(GetSettingsFileName(false, index));
     }
@@ -440,6 +503,9 @@ namespace uDrawTablet
         {
           t.ButtonStateChanged -= _ButtonStateChanged;
           t.DPadStateChanged -= _DPadStateChanged;
+          t.ChatpadKeyStateChanged -= _ChatpadKeyStateChanged;
+          t.ShiftPressed -= _ShiftPressed;
+          t.PeoplePressed -= _PeoplePressed;
           conn = t;
           break;
         }
@@ -664,107 +730,118 @@ namespace uDrawTablet
         if (doRight)
           mouse_event(MOUSEEVENTF_MOVE, _accel, 0, 0, UIntPtr.Zero);
 
-        _CheckKeys(conn, conn.Settings.AAction, TabletOptionButton.TabletButton.ACross, conn.Tablet.ButtonState.CrossHeld);
-        _CheckKeys(conn, conn.Settings.BAction, TabletOptionButton.TabletButton.BCircle, conn.Tablet.ButtonState.CircleHeld);
-        _CheckKeys(conn, conn.Settings.XAction, TabletOptionButton.TabletButton.XSquare, conn.Tablet.ButtonState.SquareHeld);
-        _CheckKeys(conn, conn.Settings.YAction, TabletOptionButton.TabletButton.YTriangle, conn.Tablet.ButtonState.TriangleHeld);
-        _CheckKeys(conn, conn.Settings.UpAction, TabletOptionButton.TabletButton.Up, conn.Tablet.DPadState.UpHeld);
-        _CheckKeys(conn, conn.Settings.DownAction, TabletOptionButton.TabletButton.Down, conn.Tablet.DPadState.DownHeld);
-        _CheckKeys(conn, conn.Settings.LeftAction, TabletOptionButton.TabletButton.Left, conn.Tablet.DPadState.LeftHeld);
-        _CheckKeys(conn, conn.Settings.RightAction, TabletOptionButton.TabletButton.Right, conn.Tablet.DPadState.RightHeld);
-        _CheckKeys(conn, conn.Settings.BackAction, TabletOptionButton.TabletButton.BackSelect, conn.Tablet.ButtonState.SelectHeld);
-        _CheckKeys(conn, conn.Settings.StartAction, TabletOptionButton.TabletButton.Start, conn.Tablet.ButtonState.StartHeld);
-        _CheckKeys(conn, conn.Settings.GuideAction, TabletOptionButton.TabletButton.PSXboxGuide, conn.Tablet.ButtonState.PSHeld);
+        _CheckKeys(conn.Settings.AAction, TabletOptionButton.TabletButton.ACross, conn.Tablet.ButtonState.CrossHeld);
+        _CheckKeys(conn.Settings.BAction, TabletOptionButton.TabletButton.BCircle, conn.Tablet.ButtonState.CircleHeld);
+        _CheckKeys(conn.Settings.XAction, TabletOptionButton.TabletButton.XSquare, conn.Tablet.ButtonState.SquareHeld);
+        _CheckKeys(conn.Settings.YAction, TabletOptionButton.TabletButton.YTriangle, conn.Tablet.ButtonState.TriangleHeld);
+        _CheckKeys(conn.Settings.UpAction, TabletOptionButton.TabletButton.Up, conn.Tablet.DPadState.UpHeld);
+        _CheckKeys(conn.Settings.DownAction, TabletOptionButton.TabletButton.Down, conn.Tablet.DPadState.DownHeld);
+        _CheckKeys(conn.Settings.LeftAction, TabletOptionButton.TabletButton.Left, conn.Tablet.DPadState.LeftHeld);
+        _CheckKeys(conn.Settings.RightAction, TabletOptionButton.TabletButton.Right, conn.Tablet.DPadState.RightHeld);
+        _CheckKeys(conn.Settings.BackAction, TabletOptionButton.TabletButton.BackSelect, conn.Tablet.ButtonState.SelectHeld);
+        _CheckKeys(conn.Settings.StartAction, TabletOptionButton.TabletButton.Start, conn.Tablet.ButtonState.StartHeld);
+        _CheckKeys(conn.Settings.GuideAction, TabletOptionButton.TabletButton.PSXboxGuide, conn.Tablet.ButtonState.PSHeld);
       }
     }
 
-    private static void _CheckKeys(TabletConnection conn, TabletOptionButton.ButtonAction action,
-      TabletOptionButton.TabletButton button, bool held)
+    private static void _CheckKeys(TabletOptionButton.ButtonAction action, TabletOptionButton.TabletButton button, bool held)
     {
       if (_IsKeypressAction(action))
       {
-        var a = ((int)action >> 16);
-        byte p = (byte)(a & 0xFF);
-        bool ctrl = (a & (int)Keypress.CTRL_MASK) > 0;
-        bool shift = (a & (int)Keypress.SHIFT_MASK) > 0;
-        bool alt = (a & (int)Keypress.ALT_MASK) > 0;
-        bool win = (a & (int)Keypress.WIN_MASK) > 0;
-        bool sendOnce = (a & (int)Keypress.SEND_ONCE_MASK) > 0;
+        _CheckKeys(button, ((int)action >> 16), held);
+      }
+    }
 
-        if (held)
+    private static void _CheckKeys(TabletOptionButton.TabletButton button, int a, bool held)
+    {
+      byte p = (byte)(a & 0xFF);
+      bool ctrl = (a & (int)Keypress.CTRL_MASK) > 0;
+      bool shift = (a & (int)Keypress.SHIFT_MASK) > 0;
+      bool alt = (a & (int)Keypress.ALT_MASK) > 0;
+      bool win = (a & (int)Keypress.WIN_MASK) > 0;
+      bool sendOnce = (a & (int)Keypress.SEND_ONCE_MASK) > 0;
+
+      _CheckKeys(button, p, ctrl, shift, alt, win, held, sendOnce);
+    }
+
+    private static void _CheckKeys(TabletOptionButton.TabletButton button, byte p,
+      bool ctrl, bool shift, bool alt, bool win, bool held, bool sendOnce)
+    {
+      if (held)
+      {
+        if (!_keyCounters[button].ContainsKey(p))
+          _keyCounters[button].Add(p, 0);
+
+        if (_keyCounters[button][p] == 0)
         {
-          if (!_keyCounters[button].ContainsKey(p))
-            _keyCounters[button].Add(p, 0);
+          if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Control]++;
+            keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 0, UIntPtr.Zero);
+          }
+          if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Shift]++;
+            keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 0, UIntPtr.Zero);
+          }
+          if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Alt]++;
+            keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 0, UIntPtr.Zero);
+          }
+          if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Windows]++;
+            keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 0, UIntPtr.Zero);
+          }
+        }
 
-          if (_keyCounters[button][p] == 0)
-          {
-            if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
-            {
-              _modifierCounters[Keypress.ModifierKeyCode.Control]++;
-              keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 0, UIntPtr.Zero);
-            }
-            if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
-            {
-              _modifierCounters[Keypress.ModifierKeyCode.Shift]++;
-              keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 0, UIntPtr.Zero);
-            }
-            if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
-            {
-              _modifierCounters[Keypress.ModifierKeyCode.Alt]++;
-              keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 0, UIntPtr.Zero);
-            }
-            if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
-            {
-              _modifierCounters[Keypress.ModifierKeyCode.Windows]++;
-              keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 0, UIntPtr.Zero);
-            }
-          }
-
-          //Send the keydown event
-          if (sendOnce && _keyCounters[button][p] == 1)
-          {
-            //Already sent it, do nothing
-          }
-          else
-          {
-            _keyCounters[button][p]++;
-            keybd_event(p, 0, 0, UIntPtr.Zero);
-          }
+        //Send the keydown event
+        if (sendOnce && _keyCounters[button][p] == 1)
+        {
+          //Already sent it, do nothing
         }
         else
         {
-          //Send the key up event for the key and each modifier
-          if (_keyCounters[button].ContainsKey(p) &&
-            _keyCounters[button][p] > 0)
-          {
-            _keyCounters[button][p]--;
-            keybd_event(p, 0, 2, UIntPtr.Zero);
-          }
+          _keyCounters[button][p]++;
+          keybd_event(p, 0, 0, UIntPtr.Zero);
+        }
+      }
+      else
+      {
+        //Send the key up event for the key and each modifier
+        if (_keyCounters[button].ContainsKey(p) &&
+          _keyCounters[button][p] > 0)
+        {
+          _keyCounters[button][p]--;
+          keybd_event(p, 0, 2, UIntPtr.Zero);
+        }
 
-          if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] > 0)
+        if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] > 0)
+        {
+          _modifierCounters[Keypress.ModifierKeyCode.Control]--;
+          if (_modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
+            keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 2, UIntPtr.Zero);
+        }
+        if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] > 0)
+        {
+          _modifierCounters[Keypress.ModifierKeyCode.Shift]--;
+          if (_modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
           {
-            _modifierCounters[Keypress.ModifierKeyCode.Control]--;
-            if (_modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
-              keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 2, UIntPtr.Zero);
+            keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 2, UIntPtr.Zero);
           }
-          if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] > 0)
-          {
-            _modifierCounters[Keypress.ModifierKeyCode.Shift]--;
-            if (_modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
-              keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 2, UIntPtr.Zero);
-          }
-          if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] > 0)
-          {
-            _modifierCounters[Keypress.ModifierKeyCode.Alt]--;
-            if (_modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
-              keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 2, UIntPtr.Zero);
-          }
-          if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] > 0)
-          {
-            _modifierCounters[Keypress.ModifierKeyCode.Windows]--;
-            if (_modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
-              keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 2, UIntPtr.Zero);
-          }
+        }
+        if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] > 0)
+        {
+          _modifierCounters[Keypress.ModifierKeyCode.Alt]--;
+          if (_modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
+            keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 2, UIntPtr.Zero);
+        }
+        if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] > 0)
+        {
+          _modifierCounters[Keypress.ModifierKeyCode.Windows]--;
+          if (_modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
+            keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 2, UIntPtr.Zero);
         }
       }
     }

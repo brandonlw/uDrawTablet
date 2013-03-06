@@ -36,8 +36,8 @@
       // 
       // btnRedetect
       // 
-      this.btnRedetect.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnRedetect.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.btnRedetect.Location = new System.Drawing.Point(12, 12);
       this.btnRedetect.Name = "btnRedetect";
       this.btnRedetect.Size = new System.Drawing.Size(439, 24);
@@ -79,9 +79,9 @@
       // 
       // grp360
       // 
-      this.grp360.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                  | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.grp360.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.grp360.Controls.Add(this.btnSlot4Settings);
       this.grp360.Controls.Add(this.btnSlot3Settings);
       this.grp360.Controls.Add(this.btnSlot2Settings);
@@ -201,7 +201,7 @@
       this.MaximizeBox = false;
       this.Name = "Options";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-      this.Text = "uDrawTablet Options";
+      this.Text = "Device Options";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
       this.grpPS3.ResumeLayout(false);
       this.grpPS3.PerformLayout();

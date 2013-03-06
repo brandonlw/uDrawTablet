@@ -38,7 +38,7 @@
       this.trbPrecision = new System.Windows.Forms.TrackBar();
       this.label8 = new System.Windows.Forms.Label();
       this.lblPrecision = new System.Windows.Forms.Label();
-      this.label1 = new System.Windows.Forms.Label();
+      this.lblPenClickSensitivity = new System.Windows.Forms.Label();
       this.label2 = new System.Windows.Forms.Label();
       this.label5 = new System.Windows.Forms.Label();
       this.trbPenClick = new System.Windows.Forms.TrackBar();
@@ -130,7 +130,7 @@
       this.grpMovementSettings.Controls.Add(this.trbPrecision);
       this.grpMovementSettings.Controls.Add(this.label8);
       this.grpMovementSettings.Controls.Add(this.lblPrecision);
-      this.grpMovementSettings.Controls.Add(this.label1);
+      this.grpMovementSettings.Controls.Add(this.lblPenClickSensitivity);
       this.grpMovementSettings.Controls.Add(this.label2);
       this.grpMovementSettings.Controls.Add(this.label5);
       this.grpMovementSettings.Controls.Add(this.trbPenClick);
@@ -184,14 +184,14 @@
       this.lblPrecision.TabIndex = 10;
       this.lblPrecision.Text = "Precision:";
       // 
-      // label1
+      // lblPenClickSensitivity
       // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(6, 17);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(102, 13);
-      this.label1.TabIndex = 1;
-      this.label1.Text = "Pen click sensitivity:";
+      this.lblPenClickSensitivity.AutoSize = true;
+      this.lblPenClickSensitivity.Location = new System.Drawing.Point(6, 17);
+      this.lblPenClickSensitivity.Name = "lblPenClickSensitivity";
+      this.lblPenClickSensitivity.Size = new System.Drawing.Size(102, 13);
+      this.lblPenClickSensitivity.TabIndex = 1;
+      this.lblPenClickSensitivity.Text = "Pen click sensitivity:";
       // 
       // label2
       // 
@@ -389,7 +389,7 @@
       this.chkRestrictToWindow.AutoSize = true;
       this.chkRestrictToWindow.Location = new System.Drawing.Point(3, 3);
       this.chkRestrictToWindow.Name = "chkRestrictToWindow";
-      this.chkRestrictToWindow.Size = new System.Drawing.Size(250, 17);
+      this.chkRestrictToWindow.Size = new System.Drawing.Size(244, 17);
       this.chkRestrictToWindow.TabIndex = 3;
       this.chkRestrictToWindow.Text = "Restrict absolute movement to current window";
       this.chkRestrictToWindow.UseVisualStyleBackColor = true;
@@ -399,7 +399,7 @@
       this.chkMaintainAspectRatio.AutoSize = true;
       this.chkMaintainAspectRatio.Location = new System.Drawing.Point(3, 26);
       this.chkMaintainAspectRatio.Name = "chkMaintainAspectRatio";
-      this.chkMaintainAspectRatio.Size = new System.Drawing.Size(389, 17);
+      this.chkMaintainAspectRatio.Size = new System.Drawing.Size(379, 17);
       this.chkMaintainAspectRatio.TabIndex = 2;
       this.chkMaintainAspectRatio.Text = "Maintain absolute aspect ratio (some areas of tablet surface will go unused)";
       this.chkMaintainAspectRatio.UseVisualStyleBackColor = true;
@@ -416,7 +416,7 @@
       this.flpCursorBounds.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
       this.flpCursorBounds.Location = new System.Drawing.Point(3, 49);
       this.flpCursorBounds.Name = "flpCursorBounds";
-      this.flpCursorBounds.Size = new System.Drawing.Size(389, 327);
+      this.flpCursorBounds.Size = new System.Drawing.Size(379, 327);
       this.flpCursorBounds.TabIndex = 4;
       this.flpCursorBounds.WrapContents = false;
       // 
@@ -484,7 +484,7 @@
     private System.Windows.Forms.TabControl tbcMain;
     private System.Windows.Forms.TabPage tbpButtons;
     private System.Windows.Forms.TabPage tbpMovement;
-    private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.Label lblPenClickSensitivity;
     private System.Windows.Forms.Label label3;
     private System.Windows.Forms.TrackBar trbPenClick;
     private System.Windows.Forms.Label label2;

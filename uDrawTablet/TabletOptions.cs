@@ -15,6 +15,7 @@ namespace uDrawTablet
     private string _iniFileName;
     private TabletSettings _settings;
     private string _currentDisplay;
+    private bool _isController;
 
     #endregion
 
@@ -27,10 +28,11 @@ namespace uDrawTablet
       _Init();
     }
 
-    public TabletOptions(string iniFileName, TabletSettings settings)
+    public TabletOptions(bool isController, string iniFileName, TabletSettings settings)
     {
       InitializeComponent();
 
+      _isController = isController;
       _iniFileName = iniFileName;
       _settings = settings;
 
@@ -43,14 +45,39 @@ namespace uDrawTablet
 
     private void _Init()
     {
-      this.Text = "Tablet Options - " + _iniFileName;
+      if (_isController)
+      {
+        //Hide certain options
+        tbcMain.Controls.Remove(tbpDisplays);
+        tbcMain.Controls.Remove(tbpBounds);
+        grpMovementType.Enabled = false;
+        lblPenClickSensitivity.Enabled = false;
+        trbPenClick.Enabled = false;
+      }
+
+      this.Text = "Options - " + _iniFileName;
       flpCursorBounds.Controls.Add(new DockOption(DockOption.DockStyle.Vertical));
       flpCursorBounds.Controls.Add(new DockOption(DockOption.DockStyle.Horizontal));
 
       foreach (TabletOptionButton.TabletButton button in Enum.GetValues(typeof(TabletOptionButton.TabletButton)))
       {
-        var ctrl = new TabletOptionButton(button);
-        flpMain.Controls.Add(ctrl);
+        bool display = button < TabletOptionButton.TabletButton.Hidden;
+        if (_isController)
+        {
+          if (button == TabletOptionButton.TabletButton.PenClick)
+            display = false;
+        }
+        else
+        {
+          if (button == TabletOptionButton.TabletButton.People)
+            display = false;
+        }
+
+        if (display)
+        {
+          var ctrl = new TabletOptionButton(button);
+          flpMain.Controls.Add(ctrl);
+        }
       }
       this.Resize += Me_Resize;
 
@@ -144,6 +171,10 @@ namespace uDrawTablet
             option.Action = _settings.ClickAction;
             option.FileToExecute = _settings.ClickFile;
             break;
+          case TabletOptionButton.TabletButton.People:
+            option.Action = _settings.PeopleAction;
+            option.FileToExecute = _settings.PeopleFile;
+            break;
           default:
             break;
         }
@@ -227,6 +258,10 @@ namespace uDrawTablet
           case TabletOptionButton.TabletButton.PenClick:
             _settings.ClickAction = option.Action;
             _settings.ClickFile = option.FileToExecute;
+            break;
+          case TabletOptionButton.TabletButton.People:
+            _settings.PeopleAction = option.Action;
+            _settings.PeopleFile = option.FileToExecute;
             break;
           default:
             break;
