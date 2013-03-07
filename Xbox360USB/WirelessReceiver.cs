@@ -15,6 +15,7 @@ namespace Xbox360USB
     private const int _VENDOR_ID = 0x045E;
     private const int _PRODUCT_ID1 = 0x028E;
     private const int _PRODUCT_ID2 = 0x0291;
+    private const int _PRODUCT_ID3 = 0x0719;
     private const int _NUMBER_OF_SLOTS = 4;
     private const int _WRITE_TIMEOUT = 5000;
     private const int _WAIT_MS = 10;
@@ -223,6 +224,7 @@ namespace Xbox360USB
 
       _device = UsbDevice.OpenUsbDevice(new UsbDeviceFinder(_VENDOR_ID, _PRODUCT_ID1)) as IUsbDevice;
       if (_device == null) _device = UsbDevice.OpenUsbDevice(new UsbDeviceFinder(_VENDOR_ID, _PRODUCT_ID2)) as IUsbDevice;
+      if (_device == null) _device = UsbDevice.OpenUsbDevice(new UsbDeviceFinder(_VENDOR_ID, _PRODUCT_ID3)) as IUsbDevice;
       if (_device == null)
       {
         if (throwErrors)
