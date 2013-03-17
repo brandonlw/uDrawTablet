@@ -219,9 +219,18 @@ namespace uDrawLib
         e.Data[PRESSURE_DATA_OFFSET+1] * 0x100 + e.Data[PRESSURE_DATA_OFFSET+3]);
 
       //Get the accelerometer data
-      AccelerometerData.XAxis = (ushort)(e.Data[ACCELEROMETER_X_OFFSET] | (e.Data[ACCELEROMETER_X_OFFSET+1] << 8));
-      AccelerometerData.YAxis = (ushort)(e.Data[ACCELEROMETER_Y_OFFSET] | (e.Data[ACCELEROMETER_Y_OFFSET+1] << 8));
-      AccelerometerData.ZAxis = (ushort)(e.Data[ACCELEROMETER_Z_OFFSET] | (e.Data[ACCELEROMETER_Z_OFFSET+1] << 8));
+      const ushort X_MIN = 0x1EA; const ushort X_MAX = 0x216;
+      const ushort Y_MIN = 0x1EA; const ushort Y_MAX = 0x216;
+      const ushort Z_MIN = 0x1EC; const ushort Z_MAX = 0x218;
+      ushort x = (ushort)(e.Data[ACCELEROMETER_X_OFFSET] | (e.Data[ACCELEROMETER_X_OFFSET+1] << 8));
+      if (x < X_MIN) x = X_MIN; if (x > X_MAX) x = X_MAX;
+      AccelerometerData.XAxis = (ushort)((x - X_MIN) / (X_MAX - X_MIN));
+      ushort y = (ushort)(e.Data[ACCELEROMETER_Y_OFFSET] | (e.Data[ACCELEROMETER_Y_OFFSET+1] << 8));
+      if (y < Y_MIN) y = Y_MIN; if (y > Y_MAX) y = Y_MAX;
+      AccelerometerData.YAxis = (ushort)((y - Y_MIN) / (Y_MAX - Y_MIN));
+      ushort z = (ushort)(e.Data[ACCELEROMETER_Z_OFFSET] | (e.Data[ACCELEROMETER_Z_OFFSET+1] << 8));
+      if (z < Z_MIN) z = Z_MIN; if (z > Z_MAX) z = Z_MAX;
+      AccelerometerData.ZAxis = (ushort)((z - Z_MIN) / (Z_MAX - Z_MIN));
 
       //Parse raw data for buttons
       bool changed = false;
