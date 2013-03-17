@@ -71,6 +71,8 @@ namespace uDrawTablet
     private const DockOption.DockOptionValue _DEFAULT_HORIZONTAL_DOCK = DockOption.DockOptionValue.Left;
     private const string _KEY_VERTICAL_DOCK = "VerticalDock";
     private const DockOption.DockOptionValue _DEFAULT_VERTICAL_DOCK = DockOption.DockOptionValue.Top;
+    private const string _KEY_PPJOY_NUMBER = "PPJoyNumber";
+    private const int _DEFAULT_PPJOY_NUMBER = 0;
 
     public enum TabletMovementType
     {
@@ -115,6 +117,7 @@ namespace uDrawTablet
     public bool RestrictToCurrentWindow { get; set; }
     public DockOption.DockOptionValue HorizontalDock { get; set; }
     public DockOption.DockOptionValue VerticalDock { get; set; }
+    public int PPJoyNumber { get; set; }
 
     #endregion
 
@@ -156,6 +159,7 @@ namespace uDrawTablet
       RestrictToCurrentWindow = _DEFAULT_RESTRICT_TO_CURRENT_WINDOW;
       HorizontalDock = _DEFAULT_HORIZONTAL_DOCK;
       VerticalDock = _DEFAULT_VERTICAL_DOCK;
+      PPJoyNumber = _DEFAULT_PPJOY_NUMBER;
     }
 
     #endregion
@@ -270,6 +274,13 @@ namespace uDrawTablet
       var vdock = ret.VerticalDock; vdock = (DockOption.DockOptionValue)Enum.Parse(typeof(DockOption.DockOptionValue), sb.ToString());
       ret.VerticalDock = vdock;
 
+      //PPJoy virtual joystick number
+      sb = new StringBuilder(255);
+      GetPrivateProfileString(_DEFAULT_SECTION, _KEY_PPJOY_NUMBER, ret.PPJoyNumber.ToString(), sb, sb.Capacity,
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+      int joyNumber = ret.PPJoyNumber; int.TryParse(sb.ToString(), out joyNumber);
+      ret.PPJoyNumber = joyNumber;
+
       return ret;
     }
 
@@ -345,6 +356,10 @@ namespace uDrawTablet
 
       //Vertical dock
       WritePrivateProfileString(_DEFAULT_SECTION, _KEY_VERTICAL_DOCK, this.VerticalDock.ToString(),
+        Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
+
+      //PPJoy virtual joystick number
+      WritePrivateProfileString(_DEFAULT_SECTION, _KEY_PPJOY_NUMBER, this.PPJoyNumber.ToString(),
         Path.Combine(Directory.GetCurrentDirectory(), iniFileName));
     }
 

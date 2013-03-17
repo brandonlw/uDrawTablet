@@ -13,6 +13,10 @@ namespace uDrawLib
     public bool PSHeld;
     public bool SelectHeld;
     public bool StartHeld;
+    public bool LeftStickHeld;
+    public bool RightStickHeld;
+    public bool LeftButtonHeld;
+    public bool RightButtonHeld;
 
     public Object Clone()
     {
@@ -25,6 +29,10 @@ namespace uDrawLib
       ret.SquareHeld = this.SquareHeld;
       ret.StartHeld = this.StartHeld;
       ret.TriangleHeld = this.TriangleHeld;
+      ret.LeftStickHeld = this.LeftStickHeld;
+      ret.RightStickHeld = this.RightStickHeld;
+      ret.LeftButtonHeld = this.LeftButtonHeld;
+      ret.RightButtonHeld = this.RightButtonHeld;
 
       return ret;
     }

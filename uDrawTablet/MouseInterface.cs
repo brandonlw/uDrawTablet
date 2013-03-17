@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -222,6 +223,8 @@ namespace uDrawTablet
       }
 
       Tablets.Clear();
+
+      PPJoyInterface.CloseAllHandles();
     }
 
     #endregion
@@ -563,9 +566,59 @@ namespace uDrawTablet
 
         double threshold = ((conn.Settings.PenPressureThreshold / 10.0) *
           (_MAX_PEN_PRESSURE_THRESHOLD - _MIN_PEN_PRESSURE_THRESHOLD)) + _MIN_PEN_PRESSURE_THRESHOLD;
+        bool penClicked = (conn.Tablet.PenPressure >= threshold);
         if (conn.LastPressure != (conn.Tablet.PenPressure >= threshold))
-          _PerformAction(conn, TabletOptionButton.TabletButton.PenClick, conn.Settings.ClickAction, conn.Tablet.PenPressure >= threshold);
+          _PerformAction(conn, TabletOptionButton.TabletButton.PenClick, conn.Settings.ClickAction, penClicked);
         conn.LastPressure = (conn.Tablet.PenPressure >= threshold);
+
+        //Send PPJoy data, if necessary
+        if (conn.Settings.PPJoyNumber > 0)
+        {
+          var buttons = new byte[16];
+          buttons[0] = (byte)(conn.Tablet.ButtonState.CrossHeld ? 1 : 0);
+          buttons[1] = (byte)(conn.Tablet.ButtonState.CircleHeld ? 1 : 0);
+          buttons[2] = (byte)(conn.Tablet.ButtonState.TriangleHeld ? 1 : 0);
+          buttons[3] = (byte)(conn.Tablet.ButtonState.SquareHeld ? 1 : 0);
+          buttons[4] = (byte)(conn.Tablet.DPadState.UpHeld ? 1 : 0);
+          buttons[5] = (byte)(conn.Tablet.DPadState.DownHeld ? 1 : 0);
+          buttons[6] = (byte)(conn.Tablet.DPadState.LeftHeld ? 1 : 0);
+          buttons[7] = (byte)(conn.Tablet.DPadState.RightHeld ? 1 : 0);
+          buttons[8] = (byte)(conn.Tablet.ButtonState.PSHeld ? 1 : 0);
+          buttons[9] = (byte)(conn.Tablet.ButtonState.SelectHeld ? 1 : 0);
+          buttons[10] = (byte)(conn.Tablet.ButtonState.StartHeld ? 1 : 0);
+          buttons[11] = (byte)(penClicked ? 1 : 0);
+          buttons[12] = (byte)(conn.Tablet.ButtonState.LeftStickHeld ? 1 : 0);
+          buttons[13] = (byte)(conn.Tablet.ButtonState.RightStickHeld ? 1 : 0);
+          buttons[14] = (byte)(conn.Tablet.ButtonState.LeftButtonHeld ? 1 : 0);
+          buttons[15] = (byte)(conn.Tablet.ButtonState.RightButtonHeld ? 1 : 0);
+          var axes = new int[11];
+          axes[0] = conn.Tablet.AccelerometerData.XAxis * 32767;
+          axes[1] = conn.Tablet.AccelerometerData.YAxis * 32767;
+          axes[2] = conn.Tablet.AccelerometerData.ZAxis * 32767;
+          if (conn.Tablet.PressureType == TabletPressureType.FingerPressed ||
+            conn.Tablet.PressureType == TabletPressureType.PenPressed)
+          {
+            axes[3] = Convert.ToInt32(32767 * (conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH));
+            axes[4] = Convert.ToInt32(32767 * (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT));
+          }
+          else
+          {
+            //Centered
+            axes[3] = Convert.ToInt32(32767 * (TABLET_PAD_WIDTH / 2.0));
+            axes[4] = Convert.ToInt32(32767 * (TABLET_PAD_HEIGHT / 2.0));
+          }
+          var controller = conn.Tablet as Xbox360InputDevice;
+          if (controller != null)
+          {
+            axes[5] = 32767 * (controller.LeftTrigger / 255);
+            axes[6] = 32767 * (controller.RightTrigger / 255);
+            axes[7] = 32767 * ((controller.X1 + 32768) / 65535);
+            axes[8] = 32767 * ((controller.Y1 + 32768) / 65535);
+            axes[9] = 32767 * ((controller.X2 + 32768) / 65535);
+            axes[10] = 32767 * ((controller.Y2 + 32768) / 65535);
+          }
+          PPJoyInterface.Update(conn.Settings.PPJoyNumber, axes, buttons);
+        }
 
         bool doUp = _IsActionRequested(conn, TabletOptionButton.ButtonAction.MoveUp);
         bool doDown = _IsActionRequested(conn, TabletOptionButton.ButtonAction.MoveDown);

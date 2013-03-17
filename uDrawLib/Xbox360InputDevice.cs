@@ -15,6 +15,13 @@ namespace uDrawLib
     private int _index;
     public WirelessReceiver.DeviceInformation Info { get; set; }
 
+    public byte LeftTrigger { get; set; }
+    public byte RightTrigger { get; set; }
+    public short X1 { get; set; }
+    public short Y1 { get; set; }
+    public short X2 { get; set; }
+    public short Y2 { get; set; }
+
     //Chatpad statuses
     public bool PeopleLit { get; set; }
     public bool ShiftLit { get; set; }
@@ -180,7 +187,7 @@ namespace uDrawLib
           if (e.Data[1] == 0x01)
           {
             //Parse raw data for buttons
-            Console.WriteLine("Controller data: " + BitConverter.ToString(e.Data));
+            //Console.WriteLine("Controller data: " + BitConverter.ToString(e.Data));
 
             bool changed = false;
             bool raw = (e.Data[7] & 0x40) > 0;
@@ -197,6 +204,14 @@ namespace uDrawLib
             changed |= ButtonState.StartHeld != raw; ButtonState.StartHeld = raw;
             raw = (e.Data[7] & 0x04) > 0;
             changed |= ButtonState.PSHeld != raw; ButtonState.PSHeld = raw;
+            raw = (e.Data[6] & 0x40) > 0;
+            changed |= ButtonState.LeftStickHeld != raw; ButtonState.LeftStickHeld = raw;
+            raw = (e.Data[6] & 0x80) > 0;
+            changed |= ButtonState.RightStickHeld != raw; ButtonState.RightStickHeld = raw;
+            raw = (e.Data[7] & 0x01) > 0;
+            changed |= ButtonState.LeftButtonHeld != raw; ButtonState.LeftButtonHeld = raw;
+            raw = (e.Data[7] & 0x02) > 0;
+            changed |= ButtonState.RightButtonHeld != raw; ButtonState.RightButtonHeld = raw;
 
             if (changed && ButtonStateChanged != null)
               ButtonStateChanged(this, EventArgs.Empty);
@@ -214,6 +229,13 @@ namespace uDrawLib
 
             if (changed && DPadStateChanged != null)
               DPadStateChanged(this, EventArgs.Empty);
+
+            LeftTrigger = e.Data[8];
+            RightTrigger = e.Data[9];
+            X1 = (short)(e.Data[10] | (e.Data[11] << 8));
+            Y1 = (short)(e.Data[12] | (e.Data[13] << 8));
+            X2 = (short)(e.Data[14] | (e.Data[15] << 8));
+            Y2 = (short)(e.Data[16] | (e.Data[17] << 8));
           }
           else if (e.Data[1] == 0x02)
           {
@@ -321,9 +343,18 @@ namespace uDrawLib
           e.Data[PRESSURE_DATA_OFFSET + 3] * 0x100 + e.Data[PRESSURE_DATA_OFFSET + 2]);
 
         //Get the accelerometer data
-        AccelerometerData.XAxis = (ushort)(e.Data[ACCELEROMETER_X_OFFSET]);
-        AccelerometerData.YAxis = (ushort)(e.Data[ACCELEROMETER_Y_OFFSET]);
-        AccelerometerData.ZAxis = (ushort)(e.Data[ACCELEROMETER_Z_OFFSET]);
+        const ushort X_MIN = 0x0C; const ushort X_MAX = 0x34;
+        const ushort Y_MIN = 0x0A; const ushort Y_MAX = 0x34;
+        const ushort Z_MIN = 0x0C; const ushort Z_MAX = 0x34;
+        ushort x = (ushort)(e.Data[ACCELEROMETER_X_OFFSET]);
+        if (x < X_MIN) x = X_MIN; if (x > X_MAX) x = X_MAX;
+        AccelerometerData.XAxis = (ushort)((x - X_MIN) / (X_MAX - X_MIN));
+        ushort y = (ushort)(e.Data[ACCELEROMETER_Y_OFFSET]);
+        if (y < Y_MIN) y = Y_MIN; if (y > Y_MAX) y = Y_MAX;
+        AccelerometerData.YAxis = (ushort)((y - Y_MIN) / (Y_MAX - Y_MIN));
+        ushort z = (ushort)(e.Data[ACCELEROMETER_Z_OFFSET]);
+        if (z < Z_MIN) z = Z_MIN; if (z > Z_MAX) z = Z_MAX;
+        AccelerometerData.ZAxis = (ushort)((z - Z_MIN) / (Z_MAX - Z_MIN));
 
         //Parse raw data for buttons
         bool changed = false;

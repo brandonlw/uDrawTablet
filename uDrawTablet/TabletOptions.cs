@@ -194,6 +194,9 @@ namespace uDrawTablet
             c.Value = _settings.VerticalDock;
         }
       }
+      cboJoystickNumber.SelectedItem = _settings.PPJoyNumber.ToString();
+      if (cboJoystickNumber.SelectedIndex == -1)
+        cboJoystickNumber.SelectedItem = "None";
     }
 
     private void _Validate()
@@ -282,6 +285,8 @@ namespace uDrawTablet
             _settings.VerticalDock = c.Value;
         }
       }
+      int joyNumber = 0; int.TryParse(cboJoystickNumber.SelectedItem.ToString(), out joyNumber);
+      _settings.PPJoyNumber = joyNumber;
     }
 
     private void _UpdateControls()

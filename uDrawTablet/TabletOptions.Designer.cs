@@ -62,6 +62,8 @@
       this.flpCursorBounds = new System.Windows.Forms.FlowLayoutPanel();
       this.btnSave = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
+      this.cboJoystickNumber = new System.Windows.Forms.ComboBox();
+      this.lblPPJoyInstructions = new System.Windows.Forms.Label();
       this.tbcMain.SuspendLayout();
       this.tbpButtons.SuspendLayout();
       this.tbpMovement.SuspendLayout();
@@ -138,9 +140,9 @@
       this.grpMovementSettings.Controls.Add(this.label3);
       this.grpMovementSettings.Controls.Add(this.label6);
       this.grpMovementSettings.Controls.Add(this.label4);
-      this.grpMovementSettings.Location = new System.Drawing.Point(9, 111);
+      this.grpMovementSettings.Location = new System.Drawing.Point(9, 133);
       this.grpMovementSettings.Name = "grpMovementSettings";
-      this.grpMovementSettings.Size = new System.Drawing.Size(397, 281);
+      this.grpMovementSettings.Size = new System.Drawing.Size(397, 259);
       this.grpMovementSettings.TabIndex = 11;
       this.grpMovementSettings.TabStop = false;
       this.grpMovementSettings.Text = "Movement Settings";
@@ -263,12 +265,14 @@
       // 
       // grpMovementType
       // 
+      this.grpMovementType.Controls.Add(this.lblPPJoyInstructions);
+      this.grpMovementType.Controls.Add(this.cboJoystickNumber);
       this.grpMovementType.Controls.Add(this.chkAllowFingerMovement);
       this.grpMovementType.Controls.Add(this.rdoAbsolute);
       this.grpMovementType.Controls.Add(this.rdoRelative);
       this.grpMovementType.Location = new System.Drawing.Point(9, 6);
       this.grpMovementType.Name = "grpMovementType";
-      this.grpMovementType.Size = new System.Drawing.Size(397, 99);
+      this.grpMovementType.Size = new System.Drawing.Size(397, 121);
       this.grpMovementType.TabIndex = 10;
       this.grpMovementType.TabStop = false;
       this.grpMovementType.Text = "Movement Type";
@@ -276,9 +280,9 @@
       // chkAllowFingerMovement
       // 
       this.chkAllowFingerMovement.AutoSize = true;
-      this.chkAllowFingerMovement.Location = new System.Drawing.Point(9, 66);
+      this.chkAllowFingerMovement.Location = new System.Drawing.Point(9, 89);
       this.chkAllowFingerMovement.Name = "chkAllowFingerMovement";
-      this.chkAllowFingerMovement.Size = new System.Drawing.Size(261, 17);
+      this.chkAllowFingerMovement.Size = new System.Drawing.Size(271, 17);
       this.chkAllowFingerMovement.TabIndex = 2;
       this.chkAllowFingerMovement.Text = "Detect movement with fingers (instead of just pen)";
       this.chkAllowFingerMovement.UseVisualStyleBackColor = true;
@@ -286,9 +290,9 @@
       // rdoAbsolute
       // 
       this.rdoAbsolute.AutoSize = true;
-      this.rdoAbsolute.Location = new System.Drawing.Point(9, 43);
+      this.rdoAbsolute.Location = new System.Drawing.Point(9, 66);
       this.rdoAbsolute.Name = "rdoAbsolute";
-      this.rdoAbsolute.Size = new System.Drawing.Size(320, 17);
+      this.rdoAbsolute.Size = new System.Drawing.Size(329, 17);
       this.rdoAbsolute.TabIndex = 1;
       this.rdoAbsolute.TabStop = true;
       this.rdoAbsolute.Text = "Absolute (taps on tablet surface correspond to screen location)";
@@ -297,9 +301,9 @@
       // rdoRelative
       // 
       this.rdoRelative.AutoSize = true;
-      this.rdoRelative.Location = new System.Drawing.Point(9, 20);
+      this.rdoRelative.Location = new System.Drawing.Point(9, 43);
       this.rdoRelative.Name = "rdoRelative";
-      this.rdoRelative.Size = new System.Drawing.Size(300, 17);
+      this.rdoRelative.Size = new System.Drawing.Size(304, 17);
       this.rdoRelative.TabIndex = 0;
       this.rdoRelative.TabStop = true;
       this.rdoRelative.Text = "Relative (swipes move mouse cursor in indicated direction)";
@@ -443,6 +447,42 @@
       this.btnCancel.UseVisualStyleBackColor = true;
       this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
       // 
+      // cboJoystickNumber
+      // 
+      this.cboJoystickNumber.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.cboJoystickNumber.FormattingEnabled = true;
+      this.cboJoystickNumber.Items.AddRange(new object[] {
+            "None",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16"});
+      this.cboJoystickNumber.Location = new System.Drawing.Point(182, 14);
+      this.cboJoystickNumber.Name = "cboJoystickNumber";
+      this.cboJoystickNumber.Size = new System.Drawing.Size(98, 21);
+      this.cboJoystickNumber.TabIndex = 3;
+      // 
+      // lblPPJoyInstructions
+      // 
+      this.lblPPJoyInstructions.AutoSize = true;
+      this.lblPPJoyInstructions.Location = new System.Drawing.Point(6, 17);
+      this.lblPPJoyInstructions.Name = "lblPPJoyInstructions";
+      this.lblPPJoyInstructions.Size = new System.Drawing.Size(163, 13);
+      this.lblPPJoyInstructions.TabIndex = 14;
+      this.lblPPJoyInstructions.Text = "PPJoy Virtual Joystick (optional):";
+      // 
       // TabletOptions
       // 
       this.AcceptButton = this.btnSave;
@@ -514,5 +554,7 @@
     private System.Windows.Forms.CheckBox chkMaintainAspectRatio;
     private System.Windows.Forms.CheckBox chkRestrictToWindow;
     private System.Windows.Forms.FlowLayoutPanel flpCursorBounds;
+    private System.Windows.Forms.Label lblPPJoyInstructions;
+    private System.Windows.Forms.ComboBox cboJoystickNumber;
   }
 }
