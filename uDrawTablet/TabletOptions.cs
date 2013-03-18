@@ -50,7 +50,9 @@ namespace uDrawTablet
         //Hide certain options
         tbcMain.Controls.Remove(tbpDisplays);
         tbcMain.Controls.Remove(tbpBounds);
-        grpMovementType.Enabled = false;
+        rdoAbsolute.Enabled = false;
+        rdoRelative.Enabled = false;
+        chkAllowFingerMovement.Enabled = false;
         lblPenClickSensitivity.Enabled = false;
         trbPenClick.Enabled = false;
       }
