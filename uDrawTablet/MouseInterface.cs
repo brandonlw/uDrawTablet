@@ -117,7 +117,7 @@ namespace uDrawTablet
 
     #region Declarations
 
-    private const int _MIN_PEN_PRESSURE_THRESHOLD = 0xD0;
+    private const int _MIN_PEN_PRESSURE_THRESHOLD = 0x80;
     private const int _MAX_PEN_PRESSURE_THRESHOLD = 0xFF;
     private static Options _frmOptions;
     private static System.Threading.Timer _timer = null;
