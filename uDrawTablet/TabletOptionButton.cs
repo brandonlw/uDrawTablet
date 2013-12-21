@@ -68,15 +68,15 @@ namespace uDrawTablet
     {
       ACross = 1,
       BCircle = 2,
-      XSquare = 3,
-      YTriangle = 4,
+      XSquare1 = 3,
+      YTriangle2 = 4,
       Up = 5,
       Down = 6,
       Left = 7,
       Right = 8,
-      Start = 9,
-      BackSelect = 10,
-      PSXboxGuide = 11,
+      StartPlus = 9,
+      BackSelectMinus = 10,
+      PSXboxGuideHome = 11,
       PenClick = 12,
       People = 13,
       Hidden = 9999
@@ -198,9 +198,9 @@ namespace uDrawTablet
             ret = "A / Cross";
             break;
           }
-        case TabletButton.BackSelect:
+        case TabletButton.BackSelectMinus:
           {
-            ret = "Back / Select";
+            ret = "Back / Select / Minus";
             break;
           }
         case TabletButton.BCircle:
@@ -208,24 +208,29 @@ namespace uDrawTablet
             ret = "B / Circle";
             break;
           }
-        case TabletButton.PSXboxGuide:
+        case TabletButton.PSXboxGuideHome:
           {
-            ret = "PS / Xbox Guide Button";
+            ret = "Home / PS / Xbox Guide Button";
             break;
           }
-        case TabletButton.XSquare:
+        case TabletButton.XSquare1:
           {
-            ret = "X / Square";
+            ret = "X / Square / One";
             break;
           }
-        case TabletButton.YTriangle:
+        case TabletButton.YTriangle2:
           {
-            ret = "Y / Triangle";
+            ret = "Y / Triangle / Two";
             break;
           }
         case TabletButton.PenClick:
           {
             ret = "Pen Click";
+            break;
+          }
+        case TabletButton.StartPlus:
+          {
+            ret = "Start / Plus";
             break;
           }
         default:

@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="ChatpadKeyStateEventArgs.cs" />
     <Compile Include="IInputDevice.cs" />
+    <Compile Include="WiiInputDevice.cs" />
     <Compile Include="Xbox360DeviceEventArgs.cs" />
     <Compile Include="Xbox360InputDevice.cs" />
     <Compile Include="DataReceivedEventArgs.cs" />

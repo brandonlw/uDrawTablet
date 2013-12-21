@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 using uDrawLib;
 
@@ -11,8 +12,8 @@ namespace uDrawTablet
     [STAThread]
     static void Main()
     {
-      //Application.EnableVisualStyles();
-      //Application.SetCompatibleTextRenderingDefault(false);
+      Application.EnableVisualStyles();
+      Application.SetCompatibleTextRenderingDefault(false);
       Application.Run(new Options());
     }
   }

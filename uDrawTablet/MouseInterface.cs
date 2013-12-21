@@ -117,7 +117,7 @@ namespace uDrawTablet
 
     #region Declarations
 
-    private const int _MIN_PEN_PRESSURE_THRESHOLD = 0x80;
+    private const int _MIN_PEN_PRESSURE_THRESHOLD = 0xD0;
     private const int _MAX_PEN_PRESSURE_THRESHOLD = 0xFF;
     private static Options _frmOptions;
     private static System.Threading.Timer _timer = null;
@@ -139,12 +139,18 @@ namespace uDrawTablet
 
     #region Public Methods
 
-    public static string GetSettingsFileName(bool isPS3, int? index)
+    public static string GetSettingsFileName(bool isWii, bool isPS3, int? index)
     {
       string ret = String.Empty;
 
-      if (isPS3)
+      if (isWii)
+      {
+        ret = "Wii.ini";
+      }
+      else if (isPS3)
+      {
         ret = "PS3.ini";
+      }
       else if (index.HasValue)
       {
         //Find the tablet with this index
@@ -168,7 +174,7 @@ namespace uDrawTablet
     public static void ReloadSettings()
     {
       foreach (var t in Tablets)
-        t.Settings = TabletSettings.LoadSettings(GetSettingsFileName(
+        t.Settings = TabletSettings.LoadSettings(GetSettingsFileName(t.Tablet as WiiInputDevice != null,
           t.Tablet as PS3InputDevice != null, t.ReceiverIndex));
     }
 
@@ -197,8 +203,21 @@ namespace uDrawTablet
       var conn = new TabletConnection((new PS3InputDevice()) as IInputDevice);
       conn.ButtonStateChanged += _ButtonStateChanged;
       conn.DPadStateChanged += _DPadStateChanged;
-      conn.Settings = TabletSettings.LoadSettings(GetSettingsFileName(true, null));
+      conn.Settings = TabletSettings.LoadSettings(GetSettingsFileName(false, true, null));
       Tablets.Add(conn);
+
+      //Set up the Wii tablet(s)
+      var devices = WiiInputDevice.GetAllDevices();
+      int i = 0;
+      foreach (var dev in devices)
+      {
+        conn = new TabletConnection((new WiiInputDevice(dev, i)));
+        conn.ButtonStateChanged += _ButtonStateChanged;
+        conn.DPadStateChanged += _DPadStateChanged;
+        conn.Settings = TabletSettings.LoadSettings(GetSettingsFileName(true, false, null));
+        Tablets.Add(conn);
+        i++;
+      }
 
       //Set up the event timer
       _timer = new System.Threading.Timer(new TimerCallback(_HandleTabletEvents), null, 0, 1);
@@ -240,15 +259,15 @@ namespace uDrawTablet
       if (conn.Tablet.ButtonState.CircleHeld != conn.LastButtonState.CircleHeld)
         _PerformAction(conn, TabletOptionButton.TabletButton.BCircle, conn.Settings.BAction, conn.Tablet.ButtonState.CircleHeld);
       if (conn.Tablet.ButtonState.SquareHeld != conn.LastButtonState.SquareHeld)
-        _PerformAction(conn, TabletOptionButton.TabletButton.XSquare, conn.Settings.XAction, conn.Tablet.ButtonState.SquareHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.XSquare1, conn.Settings.XAction, conn.Tablet.ButtonState.SquareHeld);
       if (conn.Tablet.ButtonState.TriangleHeld != conn.LastButtonState.TriangleHeld)
-        _PerformAction(conn, TabletOptionButton.TabletButton.YTriangle, conn.Settings.YAction, conn.Tablet.ButtonState.TriangleHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.YTriangle2, conn.Settings.YAction, conn.Tablet.ButtonState.TriangleHeld);
       if (conn.Tablet.ButtonState.StartHeld != conn.LastButtonState.StartHeld)
-        _PerformAction(conn, TabletOptionButton.TabletButton.Start, conn.Settings.StartAction, conn.Tablet.ButtonState.StartHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.StartPlus, conn.Settings.StartAction, conn.Tablet.ButtonState.StartHeld);
       if (conn.Tablet.ButtonState.SelectHeld != conn.LastButtonState.SelectHeld)
-        _PerformAction(conn, TabletOptionButton.TabletButton.BackSelect, conn.Settings.BackAction, conn.Tablet.ButtonState.SelectHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.BackSelectMinus, conn.Settings.BackAction, conn.Tablet.ButtonState.SelectHeld);
       if (conn.Tablet.ButtonState.PSHeld != conn.LastButtonState.PSHeld)
-        _PerformAction(conn, TabletOptionButton.TabletButton.PSXboxGuide, conn.Settings.GuideAction, conn.Tablet.ButtonState.PSHeld);
+        _PerformAction(conn, TabletOptionButton.TabletButton.PSXboxGuideHome, conn.Settings.GuideAction, conn.Tablet.ButtonState.PSHeld);
     }
 
     private static void _ChatpadKeyStateChanged(object sender, ChatpadKeyStateEventArgs e)
@@ -387,10 +406,10 @@ namespace uDrawTablet
                 case TabletOptionButton.TabletButton.BCircle:
                   p.StartInfo.FileName = conn.Settings.BFile;
                   break;
-                case TabletOptionButton.TabletButton.XSquare:
+                case TabletOptionButton.TabletButton.XSquare1:
                   p.StartInfo.FileName = conn.Settings.XFile;
                   break;
-                case TabletOptionButton.TabletButton.YTriangle:
+                case TabletOptionButton.TabletButton.YTriangle2:
                   p.StartInfo.FileName = conn.Settings.YFile;
                   break;
                 case TabletOptionButton.TabletButton.Up:
@@ -405,13 +424,13 @@ namespace uDrawTablet
                 case TabletOptionButton.TabletButton.Right:
                   p.StartInfo.FileName = conn.Settings.RightFile;
                   break;
-                case TabletOptionButton.TabletButton.Start:
+                case TabletOptionButton.TabletButton.StartPlus:
                   p.StartInfo.FileName = conn.Settings.StartFile;
                   break;
-                case TabletOptionButton.TabletButton.BackSelect:
+                case TabletOptionButton.TabletButton.BackSelectMinus:
                   p.StartInfo.FileName = conn.Settings.BackFile;
                   break;
-                case TabletOptionButton.TabletButton.PSXboxGuide:
+                case TabletOptionButton.TabletButton.PSXboxGuideHome:
                   p.StartInfo.FileName = conn.Settings.GuideFile;
                   break;
                 case TabletOptionButton.TabletButton.PenClick:
@@ -493,7 +512,7 @@ namespace uDrawTablet
       connection.ShiftPressed += _ShiftPressed;
       connection.PeoplePressed += _PeoplePressed;
       Tablets.Add(connection);
-      connection.Settings = TabletSettings.LoadSettings(GetSettingsFileName(false, index));
+      connection.Settings = TabletSettings.LoadSettings(GetSettingsFileName(false, false, index));
     }
 
     private static void _Handle360TabletDisconnect(int index)
@@ -561,9 +580,9 @@ namespace uDrawTablet
     {
       if (conn != null)
       {
-        const float TABLET_PAD_WIDTH = 1920;
-        const float TABLET_PAD_HEIGHT = 1080;
-
+        float tabletPadWidth = conn.Tablet is WiiInputDevice ? 1852 : 1920;
+        float tabletPadHeight = conn.Tablet is WiiInputDevice ? 1340 : 1080;
+        
         double threshold = ((conn.Settings.PenPressureThreshold / 10.0) *
           (_MAX_PEN_PRESSURE_THRESHOLD - _MIN_PEN_PRESSURE_THRESHOLD)) + _MIN_PEN_PRESSURE_THRESHOLD;
         bool penClicked = (conn.Tablet.PenPressure >= threshold);
@@ -598,14 +617,14 @@ namespace uDrawTablet
           if (conn.Tablet.PressureType == TabletPressureType.FingerPressed ||
             conn.Tablet.PressureType == TabletPressureType.PenPressed)
           {
-            axes[3] = Convert.ToInt32(32767 * (conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH));
-            axes[4] = Convert.ToInt32(32767 * (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT));
+            axes[3] = Convert.ToInt32(32767 * (conn.Tablet.PressurePoint.X / tabletPadWidth));
+            axes[4] = Convert.ToInt32(32767 * (conn.Tablet.PressurePoint.Y / tabletPadHeight));
           }
           else
           {
             //Centered
-            axes[3] = Convert.ToInt32(32767 * (TABLET_PAD_WIDTH / 2.0));
-            axes[4] = Convert.ToInt32(32767 * (TABLET_PAD_HEIGHT / 2.0));
+            axes[3] = Convert.ToInt32(32767 * (tabletPadWidth / 2.0));
+            axes[4] = Convert.ToInt32(32767 * (tabletPadHeight / 2.0));
           }
           var controller = conn.Tablet as Xbox360InputDevice;
           if (controller != null)
@@ -672,14 +691,14 @@ namespace uDrawTablet
             if (conn.Settings.MaintainAspectRatio)
             {
               //Get the current style based on which is higher, width or height
-              var style = ((TABLET_PAD_HEIGHT / TABLET_PAD_WIDTH) >= (actualHeight / actualWidth)) ?
+              var style = ((tabletPadHeight / tabletPadWidth) >= (actualHeight / actualWidth)) ?
                 DockOption.DockStyle.Vertical : DockOption.DockStyle.Horizontal;
 
               //Translate the width and height to tablet proportions
-              float tabletWidth = (style == DockOption.DockStyle.Vertical ? TABLET_PAD_WIDTH :
-                TABLET_PAD_WIDTH * ((TABLET_PAD_HEIGHT / TABLET_PAD_WIDTH) / (actualHeight / actualWidth)));
-              float tabletHeight = (style == DockOption.DockStyle.Horizontal ? TABLET_PAD_HEIGHT :
-                TABLET_PAD_HEIGHT * ((actualHeight / actualWidth) / (TABLET_PAD_HEIGHT / TABLET_PAD_WIDTH)));
+              float tabletWidth = (style == DockOption.DockStyle.Vertical ? tabletPadWidth :
+                tabletPadWidth * ((tabletPadHeight / tabletPadWidth) / (actualHeight / actualWidth)));
+              float tabletHeight = (style == DockOption.DockStyle.Horizontal ? tabletPadHeight :
+                tabletPadHeight * ((actualHeight / actualWidth) / (tabletPadHeight / tabletPadWidth)));
               float tabletX = 0;
               float tabletY = 0;
               if (style == DockOption.DockStyle.Horizontal)
@@ -687,10 +706,10 @@ namespace uDrawTablet
                 switch (conn.Settings.HorizontalDock)
                 {
                   case DockOption.DockOptionValue.Center:
-                    tabletX = (TABLET_PAD_WIDTH - tabletWidth) / 2;
+                    tabletX = (tabletPadWidth - tabletWidth) / 2;
                     break;
                   case DockOption.DockOptionValue.Right:
-                    tabletX = TABLET_PAD_WIDTH - tabletWidth;
+                    tabletX = tabletPadWidth - tabletWidth;
                     break;
                   default:
                     break;
@@ -701,10 +720,10 @@ namespace uDrawTablet
                 switch (conn.Settings.VerticalDock)
                 {
                   case DockOption.DockOptionValue.Center:
-                    tabletY = (TABLET_PAD_HEIGHT - tabletHeight) / 2;
+                    tabletY = (tabletPadHeight - tabletHeight) / 2;
                     break;
                   case DockOption.DockOptionValue.Right:
-                    tabletY = TABLET_PAD_HEIGHT - tabletHeight;
+                    tabletY = tabletPadHeight - tabletHeight;
                     break;
                   default:
                     break;
@@ -725,8 +744,8 @@ namespace uDrawTablet
             }
             else
             {
-              x = ((conn.Tablet.PressurePoint.X / TABLET_PAD_WIDTH) * width) + xStart;
-              y = (conn.Tablet.PressurePoint.Y / TABLET_PAD_HEIGHT * height) + yStart;
+              x = ((conn.Tablet.PressurePoint.X / tabletPadWidth) * width) + xStart;
+              y = (conn.Tablet.PressurePoint.Y / tabletPadHeight * height) + yStart;
             }
 
             if (Cursor.Position.X != x && Cursor.Position.Y != y) //not sure if this respects virtual desktop coordinates
@@ -785,15 +804,15 @@ namespace uDrawTablet
 
         _CheckKeys(conn.Settings.AAction, TabletOptionButton.TabletButton.ACross, conn.Tablet.ButtonState.CrossHeld);
         _CheckKeys(conn.Settings.BAction, TabletOptionButton.TabletButton.BCircle, conn.Tablet.ButtonState.CircleHeld);
-        _CheckKeys(conn.Settings.XAction, TabletOptionButton.TabletButton.XSquare, conn.Tablet.ButtonState.SquareHeld);
-        _CheckKeys(conn.Settings.YAction, TabletOptionButton.TabletButton.YTriangle, conn.Tablet.ButtonState.TriangleHeld);
+        _CheckKeys(conn.Settings.XAction, TabletOptionButton.TabletButton.XSquare1, conn.Tablet.ButtonState.SquareHeld);
+        _CheckKeys(conn.Settings.YAction, TabletOptionButton.TabletButton.YTriangle2, conn.Tablet.ButtonState.TriangleHeld);
         _CheckKeys(conn.Settings.UpAction, TabletOptionButton.TabletButton.Up, conn.Tablet.DPadState.UpHeld);
         _CheckKeys(conn.Settings.DownAction, TabletOptionButton.TabletButton.Down, conn.Tablet.DPadState.DownHeld);
         _CheckKeys(conn.Settings.LeftAction, TabletOptionButton.TabletButton.Left, conn.Tablet.DPadState.LeftHeld);
         _CheckKeys(conn.Settings.RightAction, TabletOptionButton.TabletButton.Right, conn.Tablet.DPadState.RightHeld);
-        _CheckKeys(conn.Settings.BackAction, TabletOptionButton.TabletButton.BackSelect, conn.Tablet.ButtonState.SelectHeld);
-        _CheckKeys(conn.Settings.StartAction, TabletOptionButton.TabletButton.Start, conn.Tablet.ButtonState.StartHeld);
-        _CheckKeys(conn.Settings.GuideAction, TabletOptionButton.TabletButton.PSXboxGuide, conn.Tablet.ButtonState.PSHeld);
+        _CheckKeys(conn.Settings.BackAction, TabletOptionButton.TabletButton.BackSelectMinus, conn.Tablet.ButtonState.SelectHeld);
+        _CheckKeys(conn.Settings.StartAction, TabletOptionButton.TabletButton.StartPlus, conn.Tablet.ButtonState.StartHeld);
+        _CheckKeys(conn.Settings.GuideAction, TabletOptionButton.TabletButton.PSXboxGuideHome, conn.Tablet.ButtonState.PSHeld);
       }
     }
 
@@ -820,82 +839,88 @@ namespace uDrawTablet
     private static void _CheckKeys(TabletOptionButton.TabletButton button, byte p,
       bool ctrl, bool shift, bool alt, bool win, bool held, bool sendOnce)
     {
-      if (held)
+      try
       {
-        if (!_keyCounters[button].ContainsKey(p))
-          _keyCounters[button].Add(p, 0);
-
-        if (_keyCounters[button][p] == 0)
+        if (held)
         {
-          if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
-          {
-            _modifierCounters[Keypress.ModifierKeyCode.Control]++;
-            keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 0, UIntPtr.Zero);
-          }
-          if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
-          {
-            _modifierCounters[Keypress.ModifierKeyCode.Shift]++;
-            keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 0, UIntPtr.Zero);
-          }
-          if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
-          {
-            _modifierCounters[Keypress.ModifierKeyCode.Alt]++;
-            keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 0, UIntPtr.Zero);
-          }
-          if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
-          {
-            _modifierCounters[Keypress.ModifierKeyCode.Windows]++;
-            keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 0, UIntPtr.Zero);
-          }
-        }
+          if (!_keyCounters[button].ContainsKey(p))
+            _keyCounters[button].Add(p, 0);
 
-        //Send the keydown event
-        if (sendOnce && _keyCounters[button][p] == 1)
-        {
-          //Already sent it, do nothing
+          if (_keyCounters[button][p] == 0)
+          {
+            if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
+            {
+              _modifierCounters[Keypress.ModifierKeyCode.Control]++;
+              keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 0, UIntPtr.Zero);
+            }
+            if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
+            {
+              _modifierCounters[Keypress.ModifierKeyCode.Shift]++;
+              keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 0, UIntPtr.Zero);
+            }
+            if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
+            {
+              _modifierCounters[Keypress.ModifierKeyCode.Alt]++;
+              keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 0, UIntPtr.Zero);
+            }
+            if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
+            {
+              _modifierCounters[Keypress.ModifierKeyCode.Windows]++;
+              keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 0, UIntPtr.Zero);
+            }
+          }
+
+          //Send the keydown event
+          if (sendOnce && _keyCounters[button][p] == 1)
+          {
+            //Already sent it, do nothing
+          }
+          else
+          {
+            _keyCounters[button][p]++;
+            keybd_event(p, 0, 0, UIntPtr.Zero);
+          }
         }
         else
         {
-          _keyCounters[button][p]++;
-          keybd_event(p, 0, 0, UIntPtr.Zero);
-        }
-      }
-      else
-      {
-        //Send the key up event for the key and each modifier
-        if (_keyCounters[button].ContainsKey(p) &&
-          _keyCounters[button][p] > 0)
-        {
-          _keyCounters[button][p]--;
-          keybd_event(p, 0, 2, UIntPtr.Zero);
-        }
-
-        if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] > 0)
-        {
-          _modifierCounters[Keypress.ModifierKeyCode.Control]--;
-          if (_modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
-            keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 2, UIntPtr.Zero);
-        }
-        if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] > 0)
-        {
-          _modifierCounters[Keypress.ModifierKeyCode.Shift]--;
-          if (_modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
+          //Send the key up event for the key and each modifier
+          if (_keyCounters[button].ContainsKey(p) &&
+            _keyCounters[button][p] > 0)
           {
-            keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 2, UIntPtr.Zero);
+            _keyCounters[button][p]--;
+            keybd_event(p, 0, 2, UIntPtr.Zero);
+          }
+
+          if (ctrl && _modifierCounters[Keypress.ModifierKeyCode.Control] > 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Control]--;
+            if (_modifierCounters[Keypress.ModifierKeyCode.Control] == 0)
+              keybd_event((byte)Keypress.ModifierKeyCode.Control, 0, 2, UIntPtr.Zero);
+          }
+          if (shift && _modifierCounters[Keypress.ModifierKeyCode.Shift] > 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Shift]--;
+            if (_modifierCounters[Keypress.ModifierKeyCode.Shift] == 0)
+            {
+              keybd_event((byte)Keypress.ModifierKeyCode.Shift, 0, 2, UIntPtr.Zero);
+            }
+          }
+          if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] > 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Alt]--;
+            if (_modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
+              keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 2, UIntPtr.Zero);
+          }
+          if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] > 0)
+          {
+            _modifierCounters[Keypress.ModifierKeyCode.Windows]--;
+            if (_modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
+              keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 2, UIntPtr.Zero);
           }
         }
-        if (alt && _modifierCounters[Keypress.ModifierKeyCode.Alt] > 0)
-        {
-          _modifierCounters[Keypress.ModifierKeyCode.Alt]--;
-          if (_modifierCounters[Keypress.ModifierKeyCode.Alt] == 0)
-            keybd_event((byte)Keypress.ModifierKeyCode.Alt, 0, 2, UIntPtr.Zero);
-        }
-        if (win && _modifierCounters[Keypress.ModifierKeyCode.Windows] > 0)
-        {
-          _modifierCounters[Keypress.ModifierKeyCode.Windows]--;
-          if (_modifierCounters[Keypress.ModifierKeyCode.Windows] == 0)
-            keybd_event((byte)Keypress.ModifierKeyCode.Windows, 0, 2, UIntPtr.Zero);
-        }
+      }
+      catch
+      {
       }
     }
 

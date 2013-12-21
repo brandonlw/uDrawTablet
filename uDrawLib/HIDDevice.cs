@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -10,8 +12,47 @@ namespace uDrawLib
   {
     #region P/Invoke Crud
 
+    [Flags]
+    public enum EFileAttributes : uint
+    {
+      Readonly = 0x00000001,
+      Hidden = 0x00000002,
+      System = 0x00000004,
+      Directory = 0x00000010,
+      Archive = 0x00000020,
+      Device = 0x00000040,
+      Normal = 0x00000080,
+      Temporary = 0x00000100,
+      SparseFile = 0x00000200,
+      ReparsePoint = 0x00000400,
+      Compressed = 0x00000800,
+      Offline = 0x00001000,
+      NotContentIndexed = 0x00002000,
+      Encrypted = 0x00004000,
+      Write_Through = 0x80000000,
+      Overlapped = 0x40000000,
+      NoBuffering = 0x20000000,
+      RandomAccess = 0x10000000,
+      SequentialScan = 0x08000000,
+      DeleteOnClose = 0x04000000,
+      BackupSemantics = 0x02000000,
+      PosixSemantics = 0x01000000,
+      OpenReparsePoint = 0x00200000,
+      OpenNoRecall = 0x00100000,
+      FirstPipeInstance = 0x00080000
+    }
+
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct GUID
+    public struct HIDD_ATTRIBUTES
+    {
+      public int Size;
+      public short VendorID;
+      public short ProductID;
+      public short VersionNumber;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct GUID
     {
       public int Data1;
       public System.UInt16 Data2;
@@ -21,18 +62,19 @@ namespace uDrawLib
     }
 
     [DllImport("hid.dll", SetLastError = true)]
-    static extern unsafe void HidD_GetHidGuid(
+    static extern void HidD_GetHidGuid(
       ref GUID lpHidGuid);
 
-    [DllImport("setupapi.dll", SetLastError = true)]
-    static extern unsafe int SetupDiGetClassDevs(
-      ref GUID lpHidGuid,
-      int* Enumerator,
-      int* hwndParent,
-      int Flags);
+    [DllImport(@"setupapi.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern IntPtr SetupDiGetClassDevs(
+      ref GUID ClassGuid,
+      [MarshalAs(UnmanagedType.LPTStr)] string Enumerator,
+      IntPtr hwndParent,
+      UInt32 Flags
+      );
 
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct SP_DEVICE_INTERFACE_DATA
+    public struct SP_DEVICE_INTERFACE_DATA
     {
       public int cbSize;
       public GUID InterfaceClassGuid;
@@ -40,83 +82,92 @@ namespace uDrawLib
       public int Reserved;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct SP_DEVICE_INTERFACE_DETAIL_DATA
+    {
+      public UInt32 cbSize;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+      public string DevicePath;
+    }
+    
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public unsafe struct PSP_DEVICE_INTERFACE_DETAIL_DATA
+    public struct PSP_DEVICE_INTERFACE_DETAIL_DATA
     {
       public int cbSize;
       [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
       public string DevicePath;
     }
 
-    [DllImport("setupapi.dll", SetLastError = true)]
-    static extern unsafe int SetupDiGetDeviceInterfaceDetail(
-      int DeviceInfoSet,
-      ref SP_DEVICE_INTERFACE_DATA lpDeviceInterfaceData,
-      int* aPtr,
-      int detailSize,
-      ref int requiredSize,
-      int* bPtr);
+    [DllImport(@"setupapi.dll", SetLastError = true)]
+    public static extern Boolean SetupDiGetDeviceInterfaceDetail(
+      IntPtr hDevInfo,
+      ref SP_DEVICE_INTERFACE_DATA deviceInterfaceData,
+      IntPtr deviceInterfaceDetailData,
+      UInt32 deviceInterfaceDetailDataSize,
+      out UInt32 requiredSize,
+      IntPtr deviceInfoData
+    );
 
-    [DllImport("setupapi.dll", SetLastError = true)]
-    static extern unsafe int SetupDiGetDeviceInterfaceDetail(
-      int DeviceInfoSet,
-      ref SP_DEVICE_INTERFACE_DATA lpDeviceInterfaceData,
-      ref PSP_DEVICE_INTERFACE_DETAIL_DATA myPSP_DEVICE_INTERFACE_DETAIL_DATA,
-      int detailSize,
-      ref int requiredSize,
-      int* bPtr);
+    [DllImport(@"setupapi.dll", SetLastError = true)]
+    public static extern Boolean SetupDiGetDeviceInterfaceDetail(
+      IntPtr hDevInfo,
+      ref SP_DEVICE_INTERFACE_DATA deviceInterfaceData,
+      ref SP_DEVICE_INTERFACE_DETAIL_DATA deviceInterfaceDetailData,
+      UInt32 deviceInterfaceDetailDataSize,
+      out UInt32 requiredSize,
+      IntPtr deviceInfoData
+    );
 
-    [DllImport("setupapi.dll", SetLastError = true)]
-    static extern unsafe int SetupDiEnumDeviceInterfaces(
-      int DeviceInfoSet,
-      int DeviceInfoData,
-      ref  GUID lpHidGuid,
-      int MemberIndex,
-      ref  SP_DEVICE_INTERFACE_DATA lpDeviceInterfaceData);
+    [DllImport(@"setupapi.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern Boolean SetupDiEnumDeviceInterfaces(
+      IntPtr hDevInfo,
+      //ref SP_DEVINFO_DATA devInfo,
+      IntPtr devInvo,
+      ref GUID interfaceClassGuid,
+      Int32 memberIndex,
+      ref SP_DEVICE_INTERFACE_DATA deviceInterfaceData
+    );
 
-    [DllImport("setupapi.dll", SetLastError = true)]
-    static extern unsafe int SetupDiDestroyDeviceInfoList(
-      int DeviceInfoSet
-      );
+    [DllImport(@"setupapi.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern UInt16 SetupDiDestroyDeviceInfoList(IntPtr hDevInfo);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern int CreateFile(
-        string lpFileName,
-        uint dwDesiredAccess,
-        uint dwShareMode,
-        uint lpSecurityAttributes,
-        uint dwCreationDisposition,
-        uint dwFlagsAndAttributes,
-        uint hTemplateFile
-        );
+    [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern SafeFileHandle CreateFile(
+      string fileName,
+      [MarshalAs(UnmanagedType.U4)] FileAccess fileAccess,
+      [MarshalAs(UnmanagedType.U4)] FileShare fileShare,
+      IntPtr securityAttributes,
+      [MarshalAs(UnmanagedType.U4)] FileMode creationDisposition,
+      [MarshalAs(UnmanagedType.U4)] EFileAttributes flags,
+      IntPtr template);
 
     [DllImport("kernel32.dll")]
-    static public extern int CloseHandle(int hObject);
+    static public extern int CloseHandle(SafeFileHandle hObject);
 
     [DllImport("hid.dll", SetLastError = true)]
-    private unsafe static extern int HidD_GetPreparsedData(
-      int hObject,
+    private static extern int HidD_GetPreparsedData(
+      SafeFileHandle hObject,
       ref int pPHIDP_PREPARSED_DATA);
 
     [DllImport("hid.dll", SetLastError = true)]
-    private unsafe static extern int HidP_GetCaps(
+    private static extern int HidP_GetCaps(
       int pPHIDP_PREPARSED_DATA,
       ref HIDP_CAPS myPHIDP_CAPS);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private unsafe static extern bool ReadFile(
-      int hFile,
-      byte[] lpBuffer,
-      int nNumberOfBytesToRead,
-      ref int lpNumberOfBytesRead,
-      int* ptr
-      );
+    [DllImport("hid.dll")]
+    internal extern static bool HidD_SetOutputReport(
+      IntPtr HidDeviceObject,
+      byte[] lpReportBuffer,
+      uint ReportBufferLength);
+
+    [DllImport("hid.dll")]
+    public static extern Boolean HidD_GetAttributes(IntPtr HidDeviceObject, ref HIDD_ATTRIBUTES Attributes);
 
     [DllImport("kernel32.dll")]
-    static public extern int WriteFile(int hFile, ref byte lpBuffer, int nNumberOfBytesToWrite, ref int lpNumberOfBytesWritten, int lpOverlapped);
+    static public extern int WriteFile(SafeFileHandle hFile, ref byte lpBuffer, int nNumberOfBytesToWrite, ref int lpNumberOfBytesWritten, int lpOverlapped);
 
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct HIDP_CAPS
+    public struct HIDP_CAPS
     {
       public System.UInt16 Usage;
       public System.UInt16 UsagePage;
@@ -152,12 +203,11 @@ namespace uDrawLib
 
     private bool _found = false;
     private GUID _guid;
-    private int _hDeviceInfo = -1;
+    private IntPtr _hDeviceInfo = IntPtr.Zero;
     private SP_DEVICE_INTERFACE_DATA _SP_DEVICE_INTERFACE_DATA;
-    private PSP_DEVICE_INTERFACE_DETAIL_DATA _PSP_DEVICE_INTERFACE_DETAIL_DATA;
     private string _devicePath;
-    private int _hidHandle;
-    private Thread _dataReadingThread;
+    private SafeFileHandle _hidHandle;
+    private FileStream _stream;
 
     #endregion
 
@@ -169,24 +219,32 @@ namespace uDrawLib
 
     #region Constructors / Teardown
 
-    public unsafe HIDDevice(string devicePath)
+    public HIDDevice(string devicePath)
     {
       _Init(devicePath, false);
     }
 
-    public unsafe HIDDevice(int vendorId, int productId)
+    public HIDDevice(int vendorId, int productId)
     {
       _Init(vendorId, productId, false);
     }
 
-    private unsafe HIDDevice(int vendorId, int productId, bool throwNotFoundError)
+    public HIDDevice(int vendorId, int productId, bool throwNotFoundError)
     {
       _Init(vendorId, productId, throwNotFoundError);
+    }
+
+    public HIDDevice(string devicePath, bool throwNotFoundError)
+    {
+      _Init(devicePath, throwNotFoundError);
     }
 
     #endregion
 
     #region Public Properties
+
+    public int InputReportLength { get; private set; }
+    public int OutputReportLength { get; private set; }
 
     public bool Found
     {
@@ -200,58 +258,57 @@ namespace uDrawLib
 
     #region Public Methods
 
-    public static unsafe List<string> GetAllDevices(int? vendorId, int? productId)
+    public static List<string> GetAllDevices(int? vendorId, int? productId)
     {
-      int result;
-      int deviceCount = 0;
-      int size = 0;
-      int requiredSize = 0;
+      int index = 0;
+      GUID guid = new GUID();
       var ret = new List<string>();
 
-      var guid = new GUID();
       HidD_GetHidGuid(ref guid);
+      IntPtr devicesHandle = SetupDiGetClassDevs(ref guid, null, IntPtr.Zero, DIGCF_INTERFACEDEVICE | DIGCF_PRESENT);
+      var diData = new SP_DEVICE_INTERFACE_DATA();
+      diData.cbSize = Marshal.SizeOf(diData);
 
-      var hDeviceInfo = SetupDiGetClassDevs(ref guid, null, null, DIGCF_INTERFACEDEVICE | DIGCF_PRESENT);
-
-      do
+      while (SetupDiEnumDeviceInterfaces(devicesHandle, IntPtr.Zero, ref guid, index, ref diData))
       {
-        var SP_DEVICE_INTERFACE_DATA = new SP_DEVICE_INTERFACE_DATA();
-        SP_DEVICE_INTERFACE_DATA.cbSize = Marshal.SizeOf(SP_DEVICE_INTERFACE_DATA);
-        result = SetupDiEnumDeviceInterfaces(hDeviceInfo, 0, ref guid, deviceCount, ref SP_DEVICE_INTERFACE_DATA);
-        SetupDiGetDeviceInterfaceDetail(hDeviceInfo, ref SP_DEVICE_INTERFACE_DATA, null, 0, ref requiredSize, null);
-        size = requiredSize;
-        var PSP_DEVICE_INTERFACE_DETAIL_DATA = new PSP_DEVICE_INTERFACE_DETAIL_DATA();
-        PSP_DEVICE_INTERFACE_DETAIL_DATA.cbSize = 5;
-        SetupDiGetDeviceInterfaceDetail(hDeviceInfo, ref SP_DEVICE_INTERFACE_DATA, ref PSP_DEVICE_INTERFACE_DETAIL_DATA,
-          size, ref requiredSize, null);
-        var devicePath = PSP_DEVICE_INTERFACE_DETAIL_DATA.DevicePath;
+        //Get the buffer size
+        UInt32 size;
+        SetupDiGetDeviceInterfaceDetail(devicesHandle, ref diData, IntPtr.Zero, 0, out size, IntPtr.Zero);
 
-        string deviceID = String.Empty;
-        if (vendorId.HasValue)
-          deviceID += "vid_" + vendorId.Value.ToString("x4");
-        if (productId.HasValue)
+        // Uh...yeah.
+        var diDetail = new SP_DEVICE_INTERFACE_DETAIL_DATA();
+        diDetail.cbSize = (uint)(IntPtr.Size == 8 ? 8 : 5);
+
+        //Get detailed information
+        if (SetupDiGetDeviceInterfaceDetail(devicesHandle, ref diData, ref diDetail, size, out size, IntPtr.Zero))
         {
-          if (!String.IsNullOrEmpty(deviceID)) deviceID += "&";
-          deviceID += "pid_" + productId.Value.ToString("x4");
-        }
-        if (String.IsNullOrEmpty(deviceID) || devicePath.IndexOf(deviceID) > 0)
-        {
-          SP_DEVICE_INTERFACE_DATA = new SP_DEVICE_INTERFACE_DATA();
-          SP_DEVICE_INTERFACE_DATA.cbSize = Marshal.SizeOf(SP_DEVICE_INTERFACE_DATA);
-          SetupDiEnumDeviceInterfaces(hDeviceInfo, 0, ref guid, deviceCount, ref SP_DEVICE_INTERFACE_DATA);
-          size = 0;
-          requiredSize = 0;
-          SetupDiGetDeviceInterfaceDetail(hDeviceInfo, ref SP_DEVICE_INTERFACE_DATA, null, size, ref requiredSize, null);
-          SetupDiGetDeviceInterfaceDetail(hDeviceInfo, ref SP_DEVICE_INTERFACE_DATA, null, size, ref requiredSize, null);
-          //var hidHandle = CreateFile(devicePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
-          ret.Add(devicePath);
-          //CloseHandle(hidHandle);
+          //Get a handle to this device
+          var handle = CreateFile(diDetail.DevicePath, FileAccess.ReadWrite, FileShare.ReadWrite,
+            IntPtr.Zero, FileMode.Open, EFileAttributes.Overlapped, IntPtr.Zero);
+
+          //Get this device's attributes
+          var attrib = new HIDD_ATTRIBUTES();
+          attrib.Size = Marshal.SizeOf(attrib);
+          if (HidD_GetAttributes(handle.DangerousGetHandle(), ref attrib))
+          {
+            //See if this is one we care about
+            if ((!vendorId.HasValue || ((attrib.VendorID & 0xFFFF) == vendorId.Value)) &&
+              (!productId.HasValue || ((attrib.ProductID & 0xFFFF) == productId.Value)))
+            {
+              ret.Add(diDetail.DevicePath);
+              break;
+            }
+          }
+
+          //Close the handle
+          handle.Close();
         }
 
-        deviceCount++;
-      } while (result != 0);
+        //Move on
+        index++;
+      }
 
-      SetupDiDestroyDeviceInfoList(hDeviceInfo);
+      SetupDiDestroyDeviceInfoList(devicesHandle);
 
       return ret;
     }
@@ -266,21 +323,14 @@ namespace uDrawLib
       return ret;
     }
 
-    public void Write(byte[] data)
+    public void Write(byte reportType, byte[] data)
     {
-      /*
-      int preparsedDataPtr = -1;
-      HidD_GetPreparsedData(_hidHandle, ref preparsedDataPtr);
-      var caps = new HIDP_CAPS();
-      HidP_GetCaps(preparsedDataPtr, ref caps);
-       */
-      int outputReportByteLength = data.Length + 1; // caps.OutputReportByteLength;
       int bytesSent = 0;
 
-      while (bytesSent < data.Length)
+      do
       {
-        byte[] buffer = new byte[outputReportByteLength];
-        buffer[0] = 0;
+        byte[] buffer = new byte[OutputReportLength];
+        buffer[0] = reportType;
         for (int i = 1; i < buffer.Length; i++)
         {
           if (bytesSent < data.Length)
@@ -294,20 +344,27 @@ namespace uDrawLib
           }
         }
 
-        int bytesWritten = 0;
-        WriteFile(_hidHandle, ref buffer[0], buffer.Length, ref bytesWritten, 0);
-      }
+        HidD_SetOutputReport(_hidHandle.DangerousGetHandle(), buffer, (uint)buffer.Length);
+      } while (bytesSent < data.Length) ;
     }
 
     public void Disconnect()
     {
-      if (_dataReadingThread != null)
+      try
       {
-        _dataReadingThread.Abort();
-        _dataReadingThread = null;
+        _stream.Close();
+      }
+      catch
+      {
       }
 
-      CloseHandle(_hidHandle);
+      try
+      {
+        CloseHandle(_hidHandle);
+      }
+      catch
+      {
+      }
 
       SetupDiDestroyDeviceInfoList(_hDeviceInfo);
     }
@@ -328,7 +385,7 @@ namespace uDrawLib
 
     #region Private Methods
 
-    private unsafe void _Init(int vendorId, int productId, bool throwNotFoundError)
+    private void _Init(int vendorId, int productId, bool throwNotFoundError)
     {
       var devices = HIDDevice.GetAllDevices(vendorId, productId);
 
@@ -343,94 +400,89 @@ namespace uDrawLib
       }
     }
 
-    private unsafe void _Init(string devicePath, bool throwNotFoundError)
+    private void _Init(string devicePath, bool throwNotFoundError)
     {
-      int result;
+      bool result;
       int deviceCount = 0;
-      int size = 0;
-      int requiredSize = 0;
+      uint size;
+      uint requiredSize;
 
       _guid = new GUID();
       HidD_GetHidGuid(ref _guid);
 
-      _hDeviceInfo = SetupDiGetClassDevs(ref _guid, null, null, DIGCF_INTERFACEDEVICE | DIGCF_PRESENT);
+      _hDeviceInfo = SetupDiGetClassDevs(ref _guid, null, IntPtr.Zero, DIGCF_INTERFACEDEVICE | DIGCF_PRESENT);
 
       do
       {
         _SP_DEVICE_INTERFACE_DATA = new SP_DEVICE_INTERFACE_DATA();
         _SP_DEVICE_INTERFACE_DATA.cbSize = Marshal.SizeOf(_SP_DEVICE_INTERFACE_DATA);
-        result = SetupDiEnumDeviceInterfaces(_hDeviceInfo, 0, ref _guid, deviceCount, ref _SP_DEVICE_INTERFACE_DATA);
-        SetupDiGetDeviceInterfaceDetail(_hDeviceInfo, ref _SP_DEVICE_INTERFACE_DATA, null, 0, ref requiredSize, null);
+        result = SetupDiEnumDeviceInterfaces(_hDeviceInfo, IntPtr.Zero, ref _guid, deviceCount, ref _SP_DEVICE_INTERFACE_DATA);
+        SetupDiGetDeviceInterfaceDetail(_hDeviceInfo, ref _SP_DEVICE_INTERFACE_DATA, IntPtr.Zero, 0, out requiredSize, IntPtr.Zero);
         size = requiredSize;
-        _PSP_DEVICE_INTERFACE_DETAIL_DATA = new PSP_DEVICE_INTERFACE_DETAIL_DATA();
-        _PSP_DEVICE_INTERFACE_DETAIL_DATA.cbSize = 5;
-        SetupDiGetDeviceInterfaceDetail(_hDeviceInfo, ref _SP_DEVICE_INTERFACE_DATA, ref _PSP_DEVICE_INTERFACE_DETAIL_DATA,
-          size, ref requiredSize, null);
-        _devicePath = _PSP_DEVICE_INTERFACE_DETAIL_DATA.DevicePath;
+        var diDetail = new SP_DEVICE_INTERFACE_DETAIL_DATA();
+        diDetail.cbSize = (uint)(IntPtr.Size == 8 ? 8 : 5);
+        SetupDiGetDeviceInterfaceDetail(_hDeviceInfo, ref _SP_DEVICE_INTERFACE_DATA, ref diDetail,
+          size, out requiredSize, IntPtr.Zero);
+        _devicePath = diDetail.DevicePath;
 
         if (_devicePath == devicePath)
         {
           _found = true;
           _SP_DEVICE_INTERFACE_DATA = new SP_DEVICE_INTERFACE_DATA();
           _SP_DEVICE_INTERFACE_DATA.cbSize = Marshal.SizeOf(_SP_DEVICE_INTERFACE_DATA);
-          SetupDiEnumDeviceInterfaces(_hDeviceInfo, 0, ref _guid, deviceCount, ref _SP_DEVICE_INTERFACE_DATA);
+          SetupDiEnumDeviceInterfaces(_hDeviceInfo, IntPtr.Zero, ref _guid, deviceCount, ref _SP_DEVICE_INTERFACE_DATA);
           size = 0;
           requiredSize = 0;
-          SetupDiGetDeviceInterfaceDetail(_hDeviceInfo, ref _SP_DEVICE_INTERFACE_DATA, null, size, ref requiredSize, null);
-          SetupDiGetDeviceInterfaceDetail(_hDeviceInfo, ref _SP_DEVICE_INTERFACE_DATA, null, size, ref requiredSize, null);
-          _hidHandle = CreateFile(_devicePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
+          SetupDiGetDeviceInterfaceDetail(_hDeviceInfo, ref _SP_DEVICE_INTERFACE_DATA, IntPtr.Zero, size, out requiredSize, IntPtr.Zero);
+          SetupDiGetDeviceInterfaceDetail(_hDeviceInfo, ref _SP_DEVICE_INTERFACE_DATA, IntPtr.Zero, size, out requiredSize, IntPtr.Zero);
+          _hidHandle = CreateFile(_devicePath, FileAccess.ReadWrite, FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, EFileAttributes.Overlapped, IntPtr.Zero);
+
+          //Get report lengths
+          int preparsedDataPtr = -1;
+          HidD_GetPreparsedData(_hidHandle, ref preparsedDataPtr);
+          var caps = new HIDP_CAPS();
+          HidP_GetCaps(preparsedDataPtr, ref caps);
+          OutputReportLength = caps.OutputReportByteLength;
+          InputReportLength = caps.InputReportByteLength;
+
+          _stream = new FileStream(_hidHandle, FileAccess.ReadWrite, InputReportLength, true);
+          var buffer = new byte[InputReportLength];
+          _stream.BeginRead(buffer, 0, buffer.Length, new AsyncCallback(OnReadData), buffer);
 
           break;
         }
 
         deviceCount++;
-      } while (result != 0);
+      } while (result);
 
       if (!_found)
       {
         if (throwNotFoundError)
           throw new InvalidOperationException("Device not found");
       }
-      else
-      {
-        _dataReadingThread = new Thread(new ThreadStart(_ReadDataThread));
-        _dataReadingThread.Start();
-      }
     }
 
-    private unsafe void _ReadDataThread()
+    private void OnReadData(IAsyncResult result)
     {
-      while (true)
+      var buffer = (byte[])result.AsyncState;
+
+      try
       {
-        int preparsedDataPtr = -1;
-        if (HidD_GetPreparsedData(_hidHandle, ref preparsedDataPtr) != 0)
+        _stream.EndRead(result);
+        var receivedData = new byte[InputReportLength - 1];
+        Array.Copy(buffer, 1, receivedData, 0, receivedData.Length);
+
+        if (receivedData != null)
         {
-          var caps = new HIDP_CAPS();
-          HidP_GetCaps(preparsedDataPtr, ref caps);
-          int reportLength = caps.InputReportByteLength;
-
-          while (true)
-          {
-            byte[] receivedData = null;
-            int bytesRead = 0;
-            byte[] buffer = new byte[reportLength];
-
-            if (ReadFile(_hidHandle, buffer, reportLength, ref bytesRead, null))
-            {
-              receivedData = new byte[bytesRead - 1];
-              Array.Copy(buffer, 1, receivedData, 0, bytesRead - 1);
-            }
-
-            if (receivedData != null)
-            {
-              if (DataReceived != null)
-                DataReceived(this, new DataReceivedEventArgs(receivedData));
-            }
-
-            //Don't do this...
-            //Thread.Sleep(1);
-          }
+          if (DataReceived != null)
+            DataReceived(this, new DataReceivedEventArgs(buffer[0], receivedData));
         }
+
+        var buf = new byte[buffer.Length];
+        _stream.BeginRead(buf, 0, buffer.Length, new AsyncCallback(OnReadData), buf);
+      }
+      catch
+      {
       }
     }
 

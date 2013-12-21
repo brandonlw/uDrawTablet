@@ -30,8 +30,11 @@
       this.lbl360_2 = new System.Windows.Forms.Label();
       this.lbl360_1 = new System.Windows.Forms.Label();
       this.lbl360Receiver = new System.Windows.Forms.Label();
+      this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.flpWiiTablets = new System.Windows.Forms.FlowLayoutPanel();
       this.grpPS3.SuspendLayout();
       this.grp360.SuspendLayout();
+      this.groupBox1.SuspendLayout();
       this.SuspendLayout();
       // 
       // btnRedetect
@@ -91,7 +94,7 @@
       this.grp360.Controls.Add(this.lbl360_2);
       this.grp360.Controls.Add(this.lbl360_1);
       this.grp360.Controls.Add(this.lbl360Receiver);
-      this.grp360.Location = new System.Drawing.Point(12, 97);
+      this.grp360.Location = new System.Drawing.Point(12, 217);
       this.grp360.Name = "grp360";
       this.grp360.Size = new System.Drawing.Size(439, 150);
       this.grp360.TabIndex = 2;
@@ -188,10 +191,31 @@
       this.lbl360Receiver.TabIndex = 0;
       this.lbl360Receiver.Text = "Xbox 360 Wireless USB Receiver";
       // 
+      // groupBox1
+      // 
+      this.groupBox1.Controls.Add(this.flpWiiTablets);
+      this.groupBox1.Location = new System.Drawing.Point(12, 97);
+      this.groupBox1.Name = "groupBox1";
+      this.groupBox1.Size = new System.Drawing.Size(439, 114);
+      this.groupBox1.TabIndex = 2;
+      this.groupBox1.TabStop = false;
+      this.groupBox1.Text = "Wii";
+      // 
+      // flpWiiTablets
+      // 
+      this.flpWiiTablets.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.flpWiiTablets.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+      this.flpWiiTablets.Location = new System.Drawing.Point(3, 17);
+      this.flpWiiTablets.Name = "flpWiiTablets";
+      this.flpWiiTablets.Size = new System.Drawing.Size(433, 94);
+      this.flpWiiTablets.TabIndex = 0;
+      this.flpWiiTablets.WrapContents = false;
+      // 
       // Options
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.ClientSize = new System.Drawing.Size(459, 259);
+      this.ClientSize = new System.Drawing.Size(459, 379);
+      this.Controls.Add(this.groupBox1);
       this.Controls.Add(this.grp360);
       this.Controls.Add(this.grpPS3);
       this.Controls.Add(this.btnRedetect);
@@ -207,6 +231,7 @@
       this.grpPS3.PerformLayout();
       this.grp360.ResumeLayout(false);
       this.grp360.PerformLayout();
+      this.groupBox1.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -227,6 +252,8 @@
     private System.Windows.Forms.Button btnSlot3Settings;
     private System.Windows.Forms.Button btnSlot2Settings;
     private System.Windows.Forms.Button btnSlot1Settings;
+    private System.Windows.Forms.GroupBox groupBox1;
+    private System.Windows.Forms.FlowLayoutPanel flpWiiTablets;
 
   }
 }

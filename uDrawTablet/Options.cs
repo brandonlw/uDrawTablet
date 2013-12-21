@@ -180,7 +180,7 @@ namespace uDrawTablet
       bool isPS3 = (sender == btnPS3Settings);
       bool isController = false;
       int? index = null;
-      if (!isPS3)
+      if (!isPS3 && !(sender is WiiTabletDevice))
       {
         //Find which 360 slot
         foreach (var slot in _slots)
@@ -201,7 +201,7 @@ namespace uDrawTablet
         }
       }
 
-      string fileName = MouseInterface.GetSettingsFileName(isPS3, index);
+      string fileName = MouseInterface.GetSettingsFileName(sender is WiiTabletDevice, isPS3, index);
       if (!String.IsNullOrEmpty(fileName))
       {
         var frm = new TabletOptions(isController, fileName, TabletSettings.LoadSettings(fileName));
@@ -238,6 +238,22 @@ namespace uDrawTablet
       else
       {
         grpPS3.Enabled = false;
+      }
+
+      flpWiiTablets.Controls.Clear();
+      if (WiiInputDevice.IsDetected())
+      {
+        foreach (var tablet in MouseInterface.Tablets)
+        {
+          var wiiTablet = tablet.Tablet as WiiInputDevice;
+          if (wiiTablet != null)
+          {
+            var ctl = new WiiTabletDevice(wiiTablet.Index.GetValueOrDefault());
+            flpWiiTablets.Controls.Add(ctl);
+            ctl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            ctl.ButtonClicked += btnSlotSettings_Click;
+          }
+        }
       }
 
       //Determine if 360 wireless receiver is connected

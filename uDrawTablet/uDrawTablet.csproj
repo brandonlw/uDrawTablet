@@ -82,6 +82,12 @@
       <DependentUpon>TabletOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="TabletSettings.cs" />
+    <Compile Include="WiiTabletDevice.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WiiTabletDevice.Designer.cs">
+      <DependentUpon>WiiTabletDevice.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="DockOption.resx">
       <DependentUpon>DockOption.cs</DependentUpon>
     </EmbeddedResource>
@@ -103,6 +109,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TabletOptions.resx">
       <DependentUpon>TabletOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WiiTabletDevice.resx">
+      <DependentUpon>WiiTabletDevice.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">

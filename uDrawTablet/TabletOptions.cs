@@ -133,11 +133,11 @@ namespace uDrawTablet
             option.Action = _settings.BAction;
             option.FileToExecute = _settings.BFile;
             break;
-          case TabletOptionButton.TabletButton.XSquare:
+          case TabletOptionButton.TabletButton.XSquare1:
             option.Action = _settings.XAction;
             option.FileToExecute = _settings.XFile;
             break;
-          case TabletOptionButton.TabletButton.YTriangle:
+          case TabletOptionButton.TabletButton.YTriangle2:
             option.Action = _settings.YAction;
             option.FileToExecute = _settings.YFile;
             break;
@@ -157,15 +157,15 @@ namespace uDrawTablet
             option.Action = _settings.RightAction;
             option.FileToExecute = _settings.RightFile;
             break;
-          case TabletOptionButton.TabletButton.Start:
+          case TabletOptionButton.TabletButton.StartPlus:
             option.Action = _settings.StartAction;
             option.FileToExecute = _settings.StartFile;
             break;
-          case TabletOptionButton.TabletButton.BackSelect:
+          case TabletOptionButton.TabletButton.BackSelectMinus:
             option.Action = _settings.BackAction;
             option.FileToExecute = _settings.BackFile;
             break;
-          case TabletOptionButton.TabletButton.PSXboxGuide:
+          case TabletOptionButton.TabletButton.PSXboxGuideHome:
             option.Action = _settings.GuideAction;
             option.FileToExecute = _settings.GuideFile;
             break;
@@ -224,11 +224,11 @@ namespace uDrawTablet
             _settings.BAction = option.Action;
             _settings.BFile = option.FileToExecute;
             break;
-          case TabletOptionButton.TabletButton.XSquare:
+          case TabletOptionButton.TabletButton.XSquare1:
             _settings.XAction = option.Action;
             _settings.XFile = option.FileToExecute;
             break;
-          case TabletOptionButton.TabletButton.YTriangle:
+          case TabletOptionButton.TabletButton.YTriangle2:
             _settings.YAction = option.Action;
             _settings.YFile = option.FileToExecute;
             break;
@@ -248,15 +248,15 @@ namespace uDrawTablet
             _settings.RightAction = option.Action;
             _settings.RightFile = option.FileToExecute;
             break;
-          case TabletOptionButton.TabletButton.Start:
+          case TabletOptionButton.TabletButton.StartPlus:
             _settings.StartAction = option.Action;
             _settings.StartFile = option.FileToExecute;
             break;
-          case TabletOptionButton.TabletButton.BackSelect:
+          case TabletOptionButton.TabletButton.BackSelectMinus:
             _settings.BackAction = option.Action;
             _settings.BackFile = option.FileToExecute;
             break;
-          case TabletOptionButton.TabletButton.PSXboxGuide:
+          case TabletOptionButton.TabletButton.PSXboxGuideHome:
             _settings.GuideAction = option.Action;
             _settings.GuideFile = option.FileToExecute;
             break;
