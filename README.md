@@ -1,12 +1,16 @@
 uDrawTablet
 ===========
 
-This is a C# .NET 2.0 PC "driver"/application for simulating mouse movements with the Wii, PS3, and Xbox 360 uDraw GameTablets.
+C# Mono/.NET PC application for simulating mouse movements with PS3, Xbox 360, and Wii uDraw GameTablets.
 
-If using the Xbox 360 tablet, make sure to install LibUsbDotNet and use the "USB InfWizard" to create a driver for your USB wireless receiver and install it first.
+Note:
+This solution is being carved out in MonoDevelop and may need reconfiguring for Visual Studio.
 
-Just run it and configure via the notification area icon.
+Contact: andyacarrillo@gmail.com
 
-For more information, see http://brandonw.net/udraw/ .
 
-For questions/comments/concerns/complaints/whatever, brandonlw@gmail.com.
+Forked off of Brandon Wilson's original effort.
+
+His website: http://brandonw.net/udraw/
+
+His email: brandonlw@gmail.com.
